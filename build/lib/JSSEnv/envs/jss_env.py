@@ -129,7 +129,7 @@ class JssEnv(gym.Env):
         self.nb_legal_actions = self.jobs
         self.nb_machine_legal = 0
         # represent all the legal actions
-        self.legal_actions = np.ones(self.jobs + 1, dtype=np.int8)
+        self.legal_actions = np.ones(self.jobs + 1, dtype=bool)
         self.legal_actions[self.jobs] = False
         # used to represent the solution
         self.solution = np.full((self.jobs, self.machines), -1, dtype=int)
@@ -150,8 +150,7 @@ class JssEnv(gym.Env):
                 self.machine_legal[needed_machine] = True
                 self.nb_machine_legal += 1
         self.state = np.zeros((self.jobs, 7), dtype=float)
-        info = {} #
-        return self._get_current_state_representation(), info
+        return self._get_current_state_representation()
 
     def _prioritization_non_final(self):
         if self.nb_machine_legal >= 1:

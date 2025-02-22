@@ -2,7 +2,7 @@ import gym
 import unittest
 import numpy as np
 from pathlib import Path
-import JSSEnv
+
 
 class TestState(unittest.TestCase):
     def test_random(self):

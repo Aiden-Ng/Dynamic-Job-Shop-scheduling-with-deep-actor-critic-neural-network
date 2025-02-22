@@ -3,5 +3,5 @@ from gym.envs.registration import register
 
 register(
     id="jss-v1",
-    entry_point="JSSEnv.envs.jss_env:JssEnv",
+    entry_point="JSSEnv.envs:JssEnv",
 )

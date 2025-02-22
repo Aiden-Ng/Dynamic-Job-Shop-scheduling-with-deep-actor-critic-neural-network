@@ -1,7 +1,6 @@
 import gym
 import unittest
 from pathlib import Path
-import JSSEnv
 
 
 class TestSolution(unittest.TestCase):

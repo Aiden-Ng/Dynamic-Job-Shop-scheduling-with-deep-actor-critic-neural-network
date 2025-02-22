@@ -2,7 +2,6 @@ import gym
 import unittest
 import imageio
 from pathlib import Path
-import JSSEnv
 
 
 class TestRendering(unittest.TestCase):

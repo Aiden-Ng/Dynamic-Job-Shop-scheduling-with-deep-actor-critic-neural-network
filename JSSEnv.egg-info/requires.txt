@@ -1,0 +1,10 @@
+gym
+pandas
+numpy
+plotly
+imageio
+psutil
+requests
+kaleido
+pytest
+codecov
