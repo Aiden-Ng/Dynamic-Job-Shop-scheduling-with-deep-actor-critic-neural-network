@@ -4,14 +4,13 @@ import imageio
 from pathlib import Path
 import JSSEnv
 
-
 class TestRendering(unittest.TestCase):
     def test_optimum_ta01_gif(self):
         # http://optimizizer.com/solution.php?name=ta01&UB=1231&problemclass=ta
         env = gym.make(
             "jss-v1",
             env_config={
-                "instance_path": f"{str(Path(__file__).parent.absolute())}/../JSSEnv/envs/instances/ta01"
+                "instance_path": (Path(__file__).parent.absolute() / ".." / "JSSEnv" / "envs" / "instances" / "ta01").resolve()
             },
         )
         env.reset()

@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 class JssEnv(gym.Env):
-    def __init__(self, env_config=None):
+    def __init__(self, env_config=None, render_mode = None):
         """
         This environment model the job shop scheduling problem as a single agent problem:
 
@@ -28,9 +28,12 @@ class JssEnv(gym.Env):
         """
         if env_config is None:
             env_config = {
-                "instance_path": Path(__file__).parent.absolute() / "instances" / "ta80"
+                "instance_path": Path(__file__).parent.absolute() / "instances" / "ta80",
             }
         instance_path = env_config["instance_path"]
+        # custom additional self declared var
+        self.render_mode = render_mode
+        
 
         # initial values for variables used for instance
         self.jobs = 0
