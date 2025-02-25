@@ -11,8 +11,11 @@ JSSEnv.egg-info/not-zip-safe
 JSSEnv.egg-info/requires.txt
 JSSEnv.egg-info/top_level.txt
 JSSEnv/envs/__init__.py
+JSSEnv/envs/djss_env.py
+JSSEnv/envs/jss_env - Copy.py
 JSSEnv/envs/jss_env.py
 JSSEnv/envs/registry.py
+JSSEnv/envs/testing_for_func_remove.py
 JSSEnv/envs/instances/dmu16
 JSSEnv/envs/instances/dmu17
 JSSEnv/envs/instances/dmu18

@@ -146,15 +146,15 @@ class JssEnv(gym.Env):
         self.illegal_actions = np.zeros((self.machines, self.jobs), dtype=bool)
         self.action_illegal_no_op = np.zeros(self.jobs, dtype=bool)
         self.machine_legal = np.zeros(self.machines, dtype=bool)
-        
         #this is to get the machine for the first operation
+        
         for job in range(self.jobs):
             needed_machine = self.instance_matrix[job][0][0]
             self.needed_machine_jobs[job] = needed_machine
-            if not self.machine_legal[needed_machine]: #if machine is not occupied
-                #if machine needed then it will come here, to set the machine_legal as true
-                #if machine is already occupied then it will not come in here
-                self.machine_legal[needed_machine] = True #marks the machine as occupied
+            #if machine needed then it will come here, to set the machine_legal as true
+            #if machine is already occupied then it will not come in here
+            if not self.machine_legal[needed_machine]: #if machine is
+                self.machine_legal[needed_machine] = True
                 self.nb_machine_legal += 1
         self.state = np.zeros((self.jobs, 7), dtype=float)
         info = {} #
