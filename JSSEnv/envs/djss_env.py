@@ -2,14 +2,16 @@
 import random
 import numpy as np
 import os
-from jss_env1 import JssEnv #if u want to debug from here remove the . from .jss_env1
+from .jss_env1 import JssEnv #if u want to debug from here remove the . from .jss_env1
 
 """
 Version : 1.01
 Date: 1/3/2025
 
 Note:
-1. Stable DJssEnv able to handle dynamic job arrival for only 2 machine
+1. This is a wrapper for jss_env1.py to handle dynamic job arrival
+2. jss_env1.py modified from jss_env to accomodate dynamic jobs
+3. Stable DJssEnv able to handle dynamic job arrival for only 2 machine
 
 Future Works:
 1. Able to pop the job once it done and align the index

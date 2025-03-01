@@ -35,7 +35,7 @@ while not done:
 
     # 3. Render the current schedule as a Plotly figure
     fig = env.render()  # This returns a Plotly figure.
-    fig.show()
+    #fig.show()
     print(type(fig))  # Ensure it's a valid Plotly figure
     print(env.instance_matrix)
 
@@ -50,28 +50,13 @@ while not done:
 
 env.close()
 
-# # 5. Save GIF
-# if images:
-#     gif_path = r"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\schedule.gif"
-#     imageio.mimsave(gif_path, images, fps=2)  # Adjust FPS as needed
-#     print(f"GIF saved as {gif_path}!")
-# else:
-#     print("No images were saved. GIF generation failed.")
+# 5. Save GIF
+if images:
+    gif_path = r"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\schedule.gif"
+    imageio.mimsave(gif_path, images, fps=2)  # Adjust FPS as needed
+    print(f"GIF saved as {gif_path}!")
+else:
+    print("No images were saved. GIF generation failed.")
 
 print("End of programme.")
 
-#dynamic scheduling's main
-# import numpy as np
-# from dynamic_jss_env import DynamicJssEnv
-
-# env_config = {"instance_path": "path/to/your/dynamic_instance.txt"}
-# env = DynamicJssEnv(env_config=env_config)
-# obs, info = env.reset()
-# done = False
-
-# while not done:
-#     legal_actions = obs["action_mask"]
-#     valid_actions = np.flatnonzero(legal_actions)
-#     action = np.random.choice(valid_actions)
-#     obs, reward, done, info = env.step(action)
-#     print("Reward:", reward)

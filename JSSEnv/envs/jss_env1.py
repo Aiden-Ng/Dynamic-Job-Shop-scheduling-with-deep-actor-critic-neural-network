@@ -8,6 +8,16 @@ import numpy as np
 import plotly.figure_factory as ff
 from pathlib import Path
 
+"""
+Version : 1.01
+Date: 1/3/2025
+
+Note:
+1. jss_env1.py modified from jss_env to accomodate dynamic jobs
+
+Future Works:
+1. Refer to djss_env.py
+"""
 
 class JssEnv(gym.Env):
     def __init__(self, env_config=None, render_mode = None):
@@ -67,7 +77,7 @@ class JssEnv(gym.Env):
         self.sum_op = 0
         
         #load the instance
-        self.machines = 2
+        self.machines = 6
         self.max_proc_time = 99 #maximum processing time
         self.operation_num_min = 3 #minimum number of operations for each jobs
         self.operation_num_max = 6 #maximum number of operations for each jobs
@@ -210,7 +220,7 @@ class JssEnv(gym.Env):
         self.legal_actions[self.jobs] = False
         if (
             len(self.next_time_step) > 0 #this got problem
-            and self.nb_machine_legal <= 2
+            and self.nb_machine_legal <= 5
             and self.nb_legal_actions <= 1
         ):
             #initialization of the values
@@ -461,7 +471,8 @@ class JssEnv(gym.Env):
         df = []
         for job in range(self.jobs):
             i = 0
-            while i < self.machines and self.solution[job][i] != -1: #NOT SURE DYNAMIC
+            # i tracks the operation of each job
+            while i < len(self.instance_matrix[job]) and self.solution[job][i] != -1: #NOT SURE DYNAMIC
                 dict_op = dict()
                 dict_op["Task"] = "Job {}".format(job)
                 start_sec = self.start_timestamp + self.solution[job][i]
