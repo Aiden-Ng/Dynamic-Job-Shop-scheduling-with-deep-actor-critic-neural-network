@@ -33,7 +33,6 @@ class JssEnv(gym.Env):
         instance_path = env_config["instance_path"]
         # custom additional self declared var
         self.render_mode = render_mode
-        
 
         # initial values for variables used for instance
         self.jobs = 0
@@ -66,30 +65,25 @@ class JssEnv(gym.Env):
         # initial values for variables used for representation
         self.start_timestamp = datetime.datetime.now().timestamp()
         self.sum_op = 0
-        with open(instance_path, "r") as instance_file:
-            for line_cnt, line_str in enumerate(instance_file, start=1):
-                split_data = list(map(int, line_str.split()))
-
-                if line_cnt == 1:
-                    self.jobs, self.machines = split_data
-                    self.instance_matrix = np.zeros((self.jobs, self.machines), dtype=(int, 2))
-                    self.jobs_length = np.zeros(self.jobs, dtype=int)
-                else:
-                    assert len(split_data) % 2 == 0 and len(split_data) // 2 == self.machines
-                    job_nb = line_cnt - 2
-                    for i in range(0, len(split_data), 2):
-                        machine, time = split_data[i], split_data[i + 1]
-                        self.instance_matrix[job_nb][i // 2] = (machine, time)
-                        self.max_time_op = max(self.max_time_op, time)
-                        self.jobs_length[job_nb] += time
-                        self.sum_op += time
-        self.max_time_jobs = max(self.jobs_length)
+        
+        #load the instance
+        self.machines = 2
+        self.max_proc_time = 99 #maximum processing time
+        self.operation_num_min = 3 #minimum number of operations for each jobs
+        self.operation_num_max = 6 #maximum number of operations for each jobs
+        #self.jobs is already initialized above
+        
+        #changed by dyanmic scheduling
+        self.instance_matrix = []
+        self.jobs_length = []
+        
+    
         # check the parsed data are correct
-        assert self.max_time_op > 0
-        assert self.max_time_jobs > 0
-        assert self.jobs > 0
+        # assert self.max_time_op > 0
+        # assert self.max_time_jobs > 0
+        # assert self.jobs > 0
         assert self.machines > 1, "We need at least 2 machines"
-        assert self.instance_matrix is not None
+        # assert self.instance_matrix is not None
         # allocate a job + one to wait
         self.action_space = gym.spaces.Discrete(self.jobs + 1)
         # used for plotting
@@ -125,44 +119,52 @@ class JssEnv(gym.Env):
     def get_legal_actions(self):
         return self.legal_actions
 
-    def reset(self):
+    def reset(self, callback):
         self.current_time_step = 0
         self.next_time_step = list()
         self.next_jobs = list()
         self.nb_legal_actions = self.jobs
-        self.nb_machine_legal = 0
+        self.nb_machine_legal = self.machines #different from jss_env.py
         # represent all the legal actions
         self.legal_actions = np.ones(self.jobs + 1, dtype=np.int8)
-        self.legal_actions[self.jobs] = False
+        self.legal_actions[self.jobs] = False #disable this because first time step no job
         # used to represent the solution
-        self.solution = np.full((self.jobs, self.machines), -1, dtype=int)
-        self.time_until_available_machine = np.zeros(self.machines, dtype=int)
+        self.solution = [] #DYNAMIC
+        self.time_until_available_machine = np.zeros(self.machines, dtype=int) #NOT DYNAMIC
         self.time_until_finish_current_op_jobs = np.zeros(self.jobs, dtype=int)
-        self.todo_time_step_job = np.zeros(self.jobs, dtype=int)
+        self.todo_time_step_job = np.zeros(self.jobs, dtype=int) 
         self.total_perform_op_time_jobs = np.zeros(self.jobs, dtype=int)
         self.needed_machine_jobs = np.zeros(self.jobs, dtype=int)
         self.total_idle_time_jobs = np.zeros(self.jobs, dtype=int)
         self.idle_time_jobs_last_op = np.zeros(self.jobs, dtype=int)
-        self.illegal_actions = np.zeros((self.machines, self.jobs), dtype=bool)
+        self.illegal_actions = np.zeros((self.machines, self.jobs), dtype=bool) #NOT DYNAMIC for self.machines, but dynamic for self.jobs
+
         self.action_illegal_no_op = np.zeros(self.jobs, dtype=bool)
-        self.machine_legal = np.zeros(self.machines, dtype=bool)
+        self.machine_legal = np.zeros(self.machines, dtype=bool) #NOT DYNAMIC #different from jss_env.py
         #this is to get the machine for the first operation
         
-        for job in range(self.jobs):
-            needed_machine = self.instance_matrix[job][0][0]
-            self.needed_machine_jobs[job] = needed_machine
-            #if machine needed then it will come here, to set the machine_legal as true
-            #if machine is already occupied then it will not come in here
-            if not self.machine_legal[needed_machine]: #if machine is
-                self.machine_legal[needed_machine] = True
-                self.nb_machine_legal += 1
         self.state = np.zeros((self.jobs, 7), dtype=float)
+
+        # at least one job for the beginning of the episode
+        if callback:
+            callback() #this callback is meant to generate new jobs and append new jobs to the instance_matrix
+        else : 
+            assert False, "Callback is not defined"
+
+        #for debugging purposes
+        self.step_count = 0
+        self.prev_action = None
+        self.last_next_time_step = None
+        self.action_last_next_time_step = None
+        self.increase_time_step_count = 0
+
         info = {} #
-        return self._get_current_state_representation(), info
+        temp = self._get_current_state_representation()
+        return temp, info
 
     def _prioritization_non_final(self):
         if self.nb_machine_legal >= 1:
-            for machine in range(self.machines):
+            for machine in range(self.machines): #NOT DYNAMIC
                 if self.machine_legal[machine]:
                     final_job = list()
                     non_final_job = list()
@@ -172,7 +174,7 @@ class JssEnv(gym.Env):
                             self.needed_machine_jobs[job] == machine
                             and self.legal_actions[job]
                         ):
-                            if self.todo_time_step_job[job] == (self.machines - 1):
+                            if self.todo_time_step_job[job] == (len(self.instance_matrix[job]) - 1): #DYANMIC
                                 final_job.append(job)
                             else:
                                 current_time_step_non_final = self.todo_time_step_job[
@@ -207,18 +209,20 @@ class JssEnv(gym.Env):
     def _check_no_op(self):
         self.legal_actions[self.jobs] = False
         if (
-            len(self.next_time_step) > 0
-            and self.nb_machine_legal <= 3
-            and self.nb_legal_actions <= 4
+            len(self.next_time_step) > 0 #this got problem
+            and self.nb_machine_legal <= 2
+            and self.nb_legal_actions <= 1
         ):
+            #initialization of the values
             machine_next = set()
             next_time_step = self.next_time_step[0]
-            max_horizon = self.current_time_step
+            max_horizon = self.current_time_step #this is not being updated
             max_horizon_machine = [
-                self.current_time_step + self.max_time_op for _ in range(self.machines)
+                self.current_time_step + self.max_time_op for _ in range(self.machines) #NOT DYNAMIC
             ]
+            
             for job in range(self.jobs):
-                if self.legal_actions[job]:
+                if self.legal_actions[job]: #consider only jobs that can be scheduled
                     time_step = self.todo_time_step_job[job]
                     machine_needed = self.instance_matrix[job][time_step][0]
                     time_needed = self.instance_matrix[job][time_step][1]
@@ -229,44 +233,41 @@ class JssEnv(gym.Env):
                         max_horizon_machine[machine_needed], end_job
                     )
                     max_horizon = max(max_horizon, max_horizon_machine[machine_needed])
+
             for job in range(self.jobs):
-                if not self.legal_actions[job]:
-                    if (
-                        self.time_until_finish_current_op_jobs[job] > 0
-                        and self.todo_time_step_job[job] + 1 < self.machines
-                    ):
+                if not self.legal_actions[job]: #consider only jobs that cannot be scheduled
+                    #self.time_until_finish_current_op_jobs[job] > 0 means that the job is currently being processed
+                    #self.todo_time_step_job[job] + 1 < self.machines means that the job is not the last operation
+                    if (self.time_until_finish_current_op_jobs[job] > 0 and self.todo_time_step_job[job] + 1 < len(self.instance_matrix[job])):
                         time_step = self.todo_time_step_job[job] + 1
                         time_needed = (
                             self.current_time_step
                             + self.time_until_finish_current_op_jobs[job]
                         )
-                        while (
-                            time_step < self.machines - 1 and max_horizon > time_needed
-                        ):
+                        # time_step < self.machines, ensuring that the job has at least one step left
+                        # max_horizon > time_needed, ensuring that the job can be completed before the latest job completion time
+                        while (time_step < len(self.instance_matrix[job]) - 1 and max_horizon > time_needed):
                             machine_needed = self.instance_matrix[job][time_step][0]
                             if (
-                                max_horizon_machine[machine_needed] > time_needed
-                                and self.machine_legal[machine_needed]
+                                max_horizon_machine[machine_needed] > time_needed #check if the machine is available
+                                and self.machine_legal[machine_needed] #check if this machine is ready for scheduling
                             ):
                                 machine_next.add(machine_needed)
-                                if len(machine_next) == self.nb_machine_legal:
+                                if len(machine_next) == self.nb_machine_legal: #issue
                                     self.legal_actions[self.jobs] = True
                                     return
                             time_needed += self.instance_matrix[job][time_step][1]
                             time_step += 1
-                    elif (
-                        not self.action_illegal_no_op[job]
-                        and self.todo_time_step_job[job] < self.machines
-                    ):
+                    # if the job is the last operation, then it will come in here
+                    elif (not self.action_illegal_no_op[job] and self.todo_time_step_job[job] < len(self.instance_matrix[job])):
                         time_step = self.todo_time_step_job[job]
                         machine_needed = self.instance_matrix[job][time_step][0]
                         time_needed = (
                             self.current_time_step
                             + self.time_until_available_machine[machine_needed]
                         )
-                        while (
-                            time_step < self.machines - 1 and max_horizon > time_needed
-                        ):
+                        # this is problematic for dynamic first scheduling cuz max_horizon cant be updated
+                        while (time_step < len(self.instance_matrix[job]) - 1 and max_horizon > time_needed):
                             machine_needed = self.instance_matrix[job][time_step][0]
                             if (
                                 max_horizon_machine[machine_needed] > time_needed
@@ -279,24 +280,36 @@ class JssEnv(gym.Env):
                             time_needed += self.instance_matrix[job][time_step][1]
                             time_step += 1
 
+            #(self.nb_legal_actions) this case is for when the machine is running, 
+            #but when the machine is done, 
+            if (self.nb_legal_actions == 0): 
+                self.legal_actions[self.jobs] = True #because this occur for the earlier round where the machine has no_legal_actions due to the absence of schedulable_jobs
+            
+
     def step(self, action: int):
+        #increment debug_action_count
+        self.step_count += 1
         reward = 0.0
-        #DEBUG, this handles the NOPE (no operation when the agent chooses not to schedule a job)
-        if action == self.jobs:
+        #this handles the NOPE (no operation when the agent chooses not to schedule a job)
+        if action == self.jobs: # why this 0 cannot be?
             self.nb_machine_legal = 0
             self.nb_legal_actions = 0
-            for job in range(self.jobs):
+            #not what this section does
+            for job in range(self.jobs): 
                 if self.legal_actions[job]:
                     self.legal_actions[job] = False
                     needed_machine = self.needed_machine_jobs[job]
                     self.machine_legal[needed_machine] = False
                     self.illegal_actions[needed_machine][job] = True
                     self.action_illegal_no_op[job] = True
-            while self.nb_machine_legal == 0:
-                reward -= self.increase_time_step()
+            self.action_last_next_time_step = self.next_time_step #DEBUG
+            while self.nb_machine_legal == 0 and len(self.next_time_step) > 0: #DEBUG, not sure different from jss_env.py
+                reward -= self.increase_time_step() 
+            self.increase_time_step_count = 0
             scaled_reward = self._reward_scaler(reward)
             self._prioritization_non_final()
             self._check_no_op()
+            self.prev_action = action #DEBUG
             return (
                 self._get_current_state_representation(),
                 scaled_reward,
@@ -304,7 +317,7 @@ class JssEnv(gym.Env):
                 {},
             )
         else:
-            current_time_step_job = self.todo_time_step_job[action] #DEBUG, not sure what this does
+            current_time_step_job = self.todo_time_step_job[action] 
             machine_needed = self.needed_machine_jobs[action]
             time_needed = self.instance_matrix[action][current_time_step_job][1] #get the time needed for that job
             reward += time_needed
@@ -318,25 +331,27 @@ class JssEnv(gym.Env):
                 self.next_jobs.insert(index, action) # not sure what this does
             self.solution[action][current_time_step_job] = self.current_time_step
             for job in range(self.jobs):
-                if (
-                    self.needed_machine_jobs[job] == machine_needed 
-                    and self.legal_actions[job]
-                ):
+                if (self.needed_machine_jobs[job] == machine_needed and self.legal_actions[job]):
                     self.legal_actions[job] = False #mark jobs that require that machine as false
                     self.nb_legal_actions -= 1
-            self.nb_machine_legal -= 1 #DEBUG, do not understand this
+            self.nb_machine_legal -= 1 
             self.machine_legal[machine_needed] = False #if machine occupied, then change the machine_legal to false
+            
+            #resets illegal actions for the machine
             for job in range(self.jobs):
                 if self.illegal_actions[machine_needed][job]:
                     self.action_illegal_no_op[job] = False
                     self.illegal_actions[machine_needed][job] = False
             # if we can't allocate new job in the current timestep, we pass to the next one
+            self.last_next_time_step = self.next_time_step #DEBUG
             while self.nb_machine_legal == 0 and len(self.next_time_step) > 0: #NOT SURE, seems like it will stuck here if no job avail
                 reward -= self.increase_time_step() 
+            self.increase_time_step_count = 0 #DEBUG
             self._prioritization_non_final() #prioritize non final jobs over final jobs
-            self._check_no_op() #NOT SURE, what is this
+            self._check_no_op() #check if we can take no operation as step
             # we then need to scale the reward
             scaled_reward = self._reward_scaler(reward)
+            self.prev_action = action #DEBUG
             return (
                 self._get_current_state_representation(),
                 scaled_reward,
@@ -353,15 +368,19 @@ class JssEnv(gym.Env):
         and return the time elapsed
         :return: time elapsed
         """
+        self.increase_time_step_count +=1
+
         hole_planning = 0
         next_time_step_to_pick = self.next_time_step.pop(0)
+        self.next_time_step_to_pick = next_time_step_to_pick #DEBUG
         self.next_jobs.pop(0)
         difference = next_time_step_to_pick - self.current_time_step
         self.current_time_step = next_time_step_to_pick
         for job in range(self.jobs):
-            was_left_time = self.time_until_finish_current_op_jobs[job]
+            was_left_time = self.time_until_finish_current_op_jobs[job] #get the time left for the specific job to finish
             if was_left_time > 0:
                 performed_op_job = min(difference, was_left_time)
+                #maths for updating the time left for the job to finish
                 self.time_until_finish_current_op_jobs[job] = max(
                     0, self.time_until_finish_current_op_jobs[job] - difference
                 )
@@ -378,8 +397,8 @@ class JssEnv(gym.Env):
                     self.idle_time_jobs_last_op[job] = difference - was_left_time
                     self.state[job][5] = self.idle_time_jobs_last_op[job] / self.sum_op
                     self.todo_time_step_job[job] += 1
-                    self.state[job][2] = self.todo_time_step_job[job] / self.machines
-                    if self.todo_time_step_job[job] < self.machines:
+                    self.state[job][2] = self.todo_time_step_job[job] / len(self.instance_matrix[job]) #DYNAMIC
+                    if self.todo_time_step_job[job] < len(self.instance_matrix[job]): #DYANMIC
                         self.needed_machine_jobs[job] = self.instance_matrix[job][
                             self.todo_time_step_job[job]
                         ][0]
@@ -401,7 +420,7 @@ class JssEnv(gym.Env):
                         if self.legal_actions[job]:
                             self.legal_actions[job] = False
                             self.nb_legal_actions -= 1
-            elif self.todo_time_step_job[job] < self.machines:
+            elif self.todo_time_step_job[job] < len(self.instance_matrix[job]): #DYNAMIC
                 self.total_idle_time_jobs[job] += difference
                 self.idle_time_jobs_last_op[job] += difference
                 self.state[job][5] = self.idle_time_jobs_last_op[job] / self.sum_op
@@ -428,7 +447,11 @@ class JssEnv(gym.Env):
         return hole_planning
 
     def _is_done(self):
-        if self.nb_legal_actions == 0:
+        #add additional if self.next_time_step is not 0 means not done cuz not finished processing
+        if (
+            self.nb_legal_actions == 0 
+            and len(self.next_time_step) == 0 #the len(self.next_time_step) is crucial so it does not confuse with the state where there are no job but not done
+            ): 
             self.last_time_step = self.current_time_step
             self.last_solution = self.solution
             return True
@@ -438,7 +461,7 @@ class JssEnv(gym.Env):
         df = []
         for job in range(self.jobs):
             i = 0
-            while i < self.machines and self.solution[job][i] != -1:
+            while i < self.machines and self.solution[job][i] != -1: #NOT SURE DYNAMIC
                 dict_op = dict()
                 dict_op["Task"] = "Job {}".format(job)
                 start_sec = self.start_timestamp + self.solution[job][i]
@@ -468,7 +491,7 @@ class JssEnv(gym.Env):
 
 if __name__ == '__main__':
     env = JssEnv()
-    obs, info = env.reset()
+    obs, info = env.reset() # u will get a callback err, because u have to run it from djss_env.py
     done = False
     cum_reward = 0
     while not done:
@@ -479,4 +502,5 @@ if __name__ == '__main__':
         obs, rewards, done, _ = env.step(actions)
         cum_reward += rewards
     print(f"Cumulative reward: {cum_reward}")
+    
 

@@ -12,11 +12,12 @@ import imageio
 from pathlib import Path
 from io import BytesIO
 
+
 INSTANCE_PATH = r"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\JSSEnv\envs\instances\ta01"
 print(os.getcwd())
-env = gym.make('jss-v1',  env_config={'instance_path': INSTANCE_PATH})
+env = gym.make('djss-v1',  env_config={'instance_path': INSTANCE_PATH})
 print(gym.envs.registry.keys())
-obs, info = env.reset()
+obs, info = env.reset(callback = env.generate_new_job)
 done = False
 
 images = []
@@ -38,16 +39,16 @@ while not done:
     print(type(fig))  # Ensure it's a valid Plotly figure
     print(env.instance_matrix)
 
-#     # 4. Convert Plotly figure to an in-memory image
-#     try:
-#         img_bytes = pio.to_image(fig, format="png")  # Convert figure to PNG bytes
-#         img = imageio.imread(BytesIO(img_bytes))  # Read image from bytes
-#         images.append(img)  # Store for GIF creation
-#         print(f"Frame {len(images)} added.")
-#     except Exception as e:
-#         print("Error converting figure to image:", e)
+    # 4. Convert Plotly figure to an in-memory image
+    try:
+        img_bytes = pio.to_image(fig, format="png")  # Convert figure to PNG bytes
+        img = imageio.imread(BytesIO(img_bytes))  # Read image from bytes
+        images.append(img)  # Store for GIF creation
+        print(f"Frame {len(images)} added.")
+    except Exception as e:
+        print("Error converting figure to image:", e)
 
-# env.close()
+env.close()
 
 # # 5. Save GIF
 # if images:

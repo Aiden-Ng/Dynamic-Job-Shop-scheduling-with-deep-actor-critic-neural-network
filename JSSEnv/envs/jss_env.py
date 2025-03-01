@@ -34,6 +34,9 @@ class JssEnv(gym.Env):
         # custom additional self declared var
         self.render_mode = render_mode
         
+        #debug purposes
+        self.step_count = 0
+        self.increase_time_step_count = 0
 
         # initial values for variables used for instance
         self.jobs = 0
@@ -133,7 +136,7 @@ class JssEnv(gym.Env):
         self.nb_machine_legal = 0
         # represent all the legal actions
         self.legal_actions = np.ones(self.jobs + 1, dtype=np.int8)
-        self.legal_actions[self.jobs] = False
+        self.legal_actions[self.jobs] = False #DEBUG, unsure what is this doing
         # used to represent the solution
         self.solution = np.full((self.jobs, self.machines), -1, dtype=int)
         self.time_until_available_machine = np.zeros(self.machines, dtype=int)
@@ -157,7 +160,7 @@ class JssEnv(gym.Env):
                 self.machine_legal[needed_machine] = True #marks the machine as occupied
                 self.nb_machine_legal += 1
         self.state = np.zeros((self.jobs, 7), dtype=float)
-        info = {} #
+        info = {} 
         return self._get_current_state_representation(), info
 
     def _prioritization_non_final(self):
@@ -205,74 +208,81 @@ class JssEnv(gym.Env):
                                 self.nb_legal_actions -= 1
 
     def _check_no_op(self):
+        
         self.legal_actions[self.jobs] = False
+        #if there are less than 3 machines available, then it will not come in here
         if (
-            len(self.next_time_step) > 0
-            and self.nb_machine_legal <= 3
-            and self.nb_legal_actions <= 4
+            len(self.next_time_step) > 0 #if the machine finishes processing
+            and self.nb_machine_legal <= 3  #so if the machine that is available is less than 3, then it will come in here
+            and self.nb_legal_actions <= 4  #so if the jobs that is ready for scheduling is less than 4 is available is less than 3, then it will come in here
         ):
-            machine_next = set()
-            next_time_step = self.next_time_step[0]
-            max_horizon = self.current_time_step
-            max_horizon_machine = [
-                self.current_time_step + self.max_time_op for _ in range(self.machines)
-            ]
-            for job in range(self.jobs):
-                if self.legal_actions[job]:
+            #initializing tracking variables
+            machine_next = set() # store the machines that will soon be available
+            next_time_step = self.next_time_step[0] # get the first next event time
+            max_horizon = self.current_time_step #DEBUG, not sure if this is to track the latest job completion time
+            max_horizon_machine = [self.current_time_step + self.max_time_op for _ in range(self.machines)]
+            
+            # schedulable jobs
+            for job in range(self.jobs): #checking for all jobs
+                if self.legal_actions[job]: #considers only schedulable jobs
                     time_step = self.todo_time_step_job[job]
                     machine_needed = self.instance_matrix[job][time_step][0]
                     time_needed = self.instance_matrix[job][time_step][1]
-                    end_job = self.current_time_step + time_needed
-                    if end_job < next_time_step:
-                        return
-                    max_horizon_machine[machine_needed] = min(
-                        max_horizon_machine[machine_needed], end_job
-                    )
-                    max_horizon = max(max_horizon, max_horizon_machine[machine_needed])
-            for job in range(self.jobs):
-                if not self.legal_actions[job]:
-                    if (
-                        self.time_until_finish_current_op_jobs[job] > 0
-                        and self.todo_time_step_job[job] + 1 < self.machines
-                    ):
-                        time_step = self.todo_time_step_job[job] + 1
-                        time_needed = (
-                            self.current_time_step
-                            + self.time_until_finish_current_op_jobs[job]
-                        )
-                        while (
-                            time_step < self.machines - 1 and max_horizon > time_needed
-                        ):
-                            machine_needed = self.instance_matrix[job][time_step][0]
-                            if (
-                                max_horizon_machine[machine_needed] > time_needed
-                                and self.machine_legal[machine_needed]
-                            ):
+                    end_job = self.current_time_step + time_needed 
+                    
+                    if end_job < next_time_step: #DEBUG, if the current job's end_job is > than first element of next_time_step
+                        return # A job finished before next step -> NOPE IS DEINED
+                    
+                    # find the earliest time that machine will be available for machine_needed
+                    # if not scheduled machine due to constraint or occupied by other machines, it will be max_proc_time = 99
+                    # else it will be based on the machine processing time
+                    max_horizon_machine[machine_needed] = min(max_horizon_machine[machine_needed], end_job)
+                    # track the latest job completon time across all machines
+                    max_horizon = max(max_horizon, max_horizon_machine[machine_needed]) #not sure what it is used for
+            print("Hello world")
+
+            # non-schedulable jobs
+            for job in range(self.jobs): #checking for all jobs
+                if not self.legal_actions[job]: #consider only jobs that cannot be scheduled
+                    #self.time_until_finish_current_op_jobs[job] > 0 means that the job is currently being processed
+                    #self.todo_time_step_job[job] + 1 < self.machines means that the job is not the last operation
+                    if (self.time_until_finish_current_op_jobs[job] > 0 and self.todo_time_step_job[job] + 1 < self.machines): #DEBUG, this might need to be DYANMIC
+                        time_step = self.todo_time_step_job[job] + 1 #incrementing the steps
+                        time_needed = (self.current_time_step + self.time_until_finish_current_op_jobs[job]) #getting the current time and + operation time
+                        
+                        # time_step < self.machines, ensuring that the job has at least one step left
+                        # max_horizon > time_needed, ensuring that the job can be completed before the latest job completion time
+                        while (time_step < self.machines - 1 and max_horizon > time_needed): 
+                            machine_needed = self.instance_matrix[job][time_step][0] #getting the machine at the next time_step as time_step is incremented
+                            if ( 
+                                max_horizon_machine[machine_needed] > time_needed #max_horizon_machine refers to the earliest time that the machine will be available
+                                and self.machine_legal[machine_needed] #if this machine is legal means this machine is not scheduled
+                            ): 
                                 machine_next.add(machine_needed)
+                                #DEBUG, do not understand what does this mean.
                                 if len(machine_next) == self.nb_machine_legal:
                                     self.legal_actions[self.jobs] = True
                                     return
-                            time_needed += self.instance_matrix[job][time_step][1]
-                            time_step += 1
-                    elif (
-                        not self.action_illegal_no_op[job]
-                        and self.todo_time_step_job[job] < self.machines
-                    ):
+                            # updating the self.instance_matrix with the next time_step and incrementing the time wrt to the previous time
+                            time_needed += self.instance_matrix[job][time_step][1] #DEBUG, not sure but it seems like its being override
+                            time_step += 1 #DEBUG, not sure but it seems like its being override
+                    
+                    # DEBUG, machine that needs to be scheduled is not available due to no machine avail
+                    elif (not self.action_illegal_no_op[job]and self.todo_time_step_job[job] < self.machines):
                         time_step = self.todo_time_step_job[job]
                         machine_needed = self.instance_matrix[job][time_step][0]
                         time_needed = (
                             self.current_time_step
                             + self.time_until_available_machine[machine_needed]
                         )
-                        while (
-                            time_step < self.machines - 1 and max_horizon > time_needed
-                        ):
+                        #if it is not last operation, and (idk)
+                        while (time_step < self.machines - 1 and max_horizon > time_needed):
                             machine_needed = self.instance_matrix[job][time_step][0]
                             if (
                                 max_horizon_machine[machine_needed] > time_needed
-                                and self.machine_legal[machine_needed]
+                                and self.machine_legal[machine_needed] #if machine not available
                             ):
-                                machine_next.add(machine_needed)
+                                machine_next.add(machine_needed) #making sure all the legal machines are assigned at least once job
                                 if len(machine_next) == self.nb_machine_legal:
                                     self.legal_actions[self.jobs] = True
                                     return
@@ -280,15 +290,18 @@ class JssEnv(gym.Env):
                             time_step += 1
 
     def step(self, action: int):
+        self.step_count += 1
+        
         reward = 0.0
         #DEBUG, this handles the NOPE (no operation when the agent chooses not to schedule a job)
         if action == self.jobs:
             self.nb_machine_legal = 0
             self.nb_legal_actions = 0
             for job in range(self.jobs):
-                if self.legal_actions[job]:
+                if self.legal_actions[job]: #allowable scheduling
                     self.legal_actions[job] = False
                     needed_machine = self.needed_machine_jobs[job]
+                    #what does this does
                     self.machine_legal[needed_machine] = False
                     self.illegal_actions[needed_machine][job] = True
                     self.action_illegal_no_op[job] = True
@@ -304,7 +317,7 @@ class JssEnv(gym.Env):
                 {},
             )
         else:
-            current_time_step_job = self.todo_time_step_job[action] #DEBUG, not sure what this does
+            current_time_step_job = self.todo_time_step_job[action] #DEBUG, current time step job number
             machine_needed = self.needed_machine_jobs[action]
             time_needed = self.instance_matrix[action][current_time_step_job][1] #get the time needed for that job
             reward += time_needed
@@ -314,22 +327,26 @@ class JssEnv(gym.Env):
             to_add_time_step = self.current_time_step + time_needed #calculating when will the current job end
             if to_add_time_step not in self.next_time_step:
                 index = bisect.bisect_left(self.next_time_step, to_add_time_step) # getting the index on where to_add_time_step should be
+                #stores the next_job and next_time_step with the same index
                 self.next_time_step.insert(index, to_add_time_step)
-                self.next_jobs.insert(index, action) # not sure what this does
+                self.next_jobs.insert(index, action) #related to next_time_step
+
+            # change to false if it is currelty being processed
             self.solution[action][current_time_step_job] = self.current_time_step
             for job in range(self.jobs):
-                if (
-                    self.needed_machine_jobs[job] == machine_needed 
-                    and self.legal_actions[job]
-                ):
+                if (self.needed_machine_jobs[job] == machine_needed and self.legal_actions[job]):
+                    #scheduling the job
                     self.legal_actions[job] = False #mark jobs that require that machine as false
                     self.nb_legal_actions -= 1
             self.nb_machine_legal -= 1 #DEBUG, do not understand this
             self.machine_legal[machine_needed] = False #if machine occupied, then change the machine_legal to false
+            
+            #resets illegal actions for the machine
             for job in range(self.jobs):
                 if self.illegal_actions[machine_needed][job]:
                     self.action_illegal_no_op[job] = False
                     self.illegal_actions[machine_needed][job] = False
+
             # if we can't allocate new job in the current timestep, we pass to the next one
             while self.nb_machine_legal == 0 and len(self.next_time_step) > 0: #NOT SURE, seems like it will stuck here if no job avail
                 reward -= self.increase_time_step() 
@@ -353,11 +370,13 @@ class JssEnv(gym.Env):
         and return the time elapsed
         :return: time elapsed
         """
+        self.increase_time_step_count += 1
+
         hole_planning = 0
         next_time_step_to_pick = self.next_time_step.pop(0)
         self.next_jobs.pop(0)
         difference = next_time_step_to_pick - self.current_time_step
-        self.current_time_step = next_time_step_to_pick
+        self.current_time_step = next_time_step_to_pick #increases the next time step
         for job in range(self.jobs):
             was_left_time = self.time_until_finish_current_op_jobs[job]
             if was_left_time > 0:
@@ -410,15 +429,17 @@ class JssEnv(gym.Env):
             if self.time_until_available_machine[machine] < difference:
                 empty = difference - self.time_until_available_machine[machine]
                 hole_planning += empty
+            #reduce remaining processing time for each machines
             self.time_until_available_machine[machine] = max(
                 0, self.time_until_available_machine[machine] - difference
             )
+            #check if the machine is free
             if self.time_until_available_machine[machine] == 0:
                 for job in range(self.jobs):
                     if (
-                        self.needed_machine_jobs[job] == machine
-                        and not self.legal_actions[job]
-                        and not self.illegal_actions[machine][job]
+                        self.needed_machine_jobs[job] == machine # job requires this machine
+                        and not self.legal_actions[job] #job is currently not scheduled
+                        and not self.illegal_actions[machine][job] #job is not illegal
                     ):
                         self.legal_actions[job] = True
                         self.nb_legal_actions += 1
