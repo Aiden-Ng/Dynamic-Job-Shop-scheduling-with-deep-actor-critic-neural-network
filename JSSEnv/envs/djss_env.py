@@ -52,7 +52,7 @@ class DynamicJssEnv(JssEnv):
                     machine_order.append(machine_num)
 
             for machine in machine_order:
-                time = random.randint(1, self.max_proc_time) #randomly generate 1 to max_proc_time
+                time = random.randint(self.min_proc_time, self.max_proc_time) #randomly generate 1 to max_proc_time
                 new_job.append((machine, time))
                 
                 #variables from jssp

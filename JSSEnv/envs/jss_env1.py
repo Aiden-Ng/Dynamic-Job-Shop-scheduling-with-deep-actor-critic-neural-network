@@ -78,6 +78,7 @@ class JssEnv(gym.Env):
         
         #load the instance
         self.machines = 6
+        self.min_proc_time = 10 #minimum processing time
         self.max_proc_time = 99 #maximum processing time
         self.operation_num_min = 3 #minimum number of operations for each jobs
         self.operation_num_max = 6 #maximum number of operations for each jobs
