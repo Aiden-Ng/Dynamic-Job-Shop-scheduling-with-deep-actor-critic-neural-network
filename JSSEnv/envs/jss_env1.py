@@ -9,6 +9,7 @@ import plotly.figure_factory as ff
 from pathlib import Path
 
 """
+
 Version : 1.01
 Date: 1/3/2025
 
@@ -78,17 +79,24 @@ class JssEnv(gym.Env):
         
         #load the instance
         self.machines = 6
-        self.min_proc_time = 10 #minimum processing time
-        self.max_proc_time = 99 #maximum processing time
-        self.operation_num_min = 3 #minimum number of operations for each jobs
+        self.min_proc_time = 50 #minimum processing time
+        self.max_proc_time = 60 #maximum processing time
+        self.operation_num_min = 5 #minimum number of operations for each jobs
         self.operation_num_max = 6 #maximum number of operations for each jobs
         #self.jobs is already initialized above
         
         #changed by dyanmic scheduling
         self.instance_matrix = []
         self.jobs_length = []
+
+        #initialize the variable required for action selection S/RPT + SPT dispatching rule
+        self.due_date_jobs = [] #must be dynamic
+        self.allowance_jobs = []
+        self.slack_jobs = []
         
-    
+        #additional variables
+        self.due_date_jobs = None
+
         # check the parsed data are correct
         # assert self.max_time_op > 0
         # assert self.max_time_jobs > 0
@@ -153,8 +161,14 @@ class JssEnv(gym.Env):
         self.action_illegal_no_op = np.zeros(self.jobs, dtype=bool)
         self.machine_legal = np.zeros(self.machines, dtype=bool) #NOT DYNAMIC #different from jss_env.py
         #this is to get the machine for the first operation
-        
         self.state = np.zeros((self.jobs, 7), dtype=float)
+
+        #additional variables
+        self.due_date_jobs = np.zeros(self.jobs, dtype=int) 
+        self.allowance_jobs = np.zeros(self.jobs, dtype=int) 
+        self.slack_jobs = np.zeros(self.jobs, dtype=int) 
+        self.time_taken_to_proc_all_jobs = np.zeros(self.jobs, dtype=int) 
+        self.jobs = 0 #reset the number of jobs
 
         # at least one job for the beginning of the episode
         if callback:
@@ -221,8 +235,8 @@ class JssEnv(gym.Env):
         self.legal_actions[self.jobs] = False
         if (
             len(self.next_time_step) > 0 #this got problem
-            and self.nb_machine_legal <= 5
-            and self.nb_legal_actions <= 1
+            #and self.nb_machine_legal <= 2 #this will keep causing nan probability
+            # and self.nb_legal_actions <= 2
         ):
             #initialization of the values
             machine_next = set()
@@ -395,13 +409,17 @@ class JssEnv(gym.Env):
                 self.time_until_finish_current_op_jobs[job] = max(
                     0, self.time_until_finish_current_op_jobs[job] - difference
                 )
+                #updating self.state
                 self.state[job][1] = (
                     self.time_until_finish_current_op_jobs[job] / self.max_time_op
                 )
+                #updating the job completion time
                 self.total_perform_op_time_jobs[job] += performed_op_job
                 self.state[job][3] = (
                     self.total_perform_op_time_jobs[job] / self.max_time_jobs
                 )
+
+
                 if self.time_until_finish_current_op_jobs[job] == 0:
                     self.total_idle_time_jobs[job] += difference - was_left_time
                     self.state[job][6] = self.total_idle_time_jobs[job] / self.sum_op
@@ -448,20 +466,27 @@ class JssEnv(gym.Env):
                     if (
                         self.needed_machine_jobs[job] == machine
                         and not self.legal_actions[job]
-                        and not self.illegal_actions[machine][job]
+                        and not self.illegal_actions[machine][job] 
                     ):
                         self.legal_actions[job] = True
                         self.nb_legal_actions += 1
                         if not self.machine_legal[machine]:
                             self.machine_legal[machine] = True
                             self.nb_machine_legal += 1
+
+        #updating the allowance and slack for S/RPT + SPT dispatching rule
+        self.allowance_jobs = self.due_date_jobs - self.current_time_step
+        time_remaining_for_proc = (self.jobs_length - self.total_perform_op_time_jobs)
+        self.slack_jobs =  self.allowance_jobs - time_remaining_for_proc
+        
         return hole_planning
 
     def _is_done(self):
         #add additional if self.next_time_step is not 0 means not done cuz not finished processing
         if (
             self.nb_legal_actions == 0 
-            and len(self.next_time_step) == 0 #the len(self.next_time_step) is crucial so it does not confuse with the state where there are no job but not done
+            #and len(self.next_time_step) == 0 #the len(self.next_time_step) is crucial so it does not confuse with the state where there are no job but not done
+            and np.array_equal(self.todo_time_step_job, np.array(list(map(lambda job : len(job), self.instance_matrix)))) 
             ): 
             self.last_time_step = self.current_time_step
             self.last_solution = self.solution
