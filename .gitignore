@@ -2,3 +2,8 @@ venv
 conda_fyp_venv
 venv-py3.9
 schedule.gif
+
+#this is for to test the files
+testing_func_before_apply
+#this is to ignore the makespan graph plotting
+(TESTING) automated_testing/(PLOT) makespan

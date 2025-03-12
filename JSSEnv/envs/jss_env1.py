@@ -94,6 +94,8 @@ class JssEnv(gym.Env):
         self.allowance_jobs = []
         self.slack_jobs = []
         
+        self.makespan = 0 #this is a singular value
+        
         #additional variables
         self.due_date_jobs = None
 
@@ -169,6 +171,7 @@ class JssEnv(gym.Env):
         self.slack_jobs = np.zeros(self.jobs, dtype=int) 
         self.time_taken_to_proc_all_jobs = np.zeros(self.jobs, dtype=int) 
         self.jobs = 0 #reset the number of jobs
+        self.makespan = 0 #reset the makespan   
 
         # at least one job for the beginning of the episode
         if callback:
@@ -476,8 +479,11 @@ class JssEnv(gym.Env):
 
         #updating the allowance and slack for S/RPT + SPT dispatching rule
         self.allowance_jobs = self.due_date_jobs - self.current_time_step
-        time_remaining_for_proc = (self.jobs_length - self.total_perform_op_time_jobs)
-        self.slack_jobs =  self.allowance_jobs - time_remaining_for_proc
+        remaining_processing_time = (self.jobs_length - self.total_perform_op_time_jobs)
+        self.slack_jobs =  self.allowance_jobs - remaining_processing_time
+
+        #update the makespan
+        self.makespan = max(self.makespan, max(self.total_perform_op_time_jobs + self.total_idle_time_jobs))
         
         return hole_planning
 
