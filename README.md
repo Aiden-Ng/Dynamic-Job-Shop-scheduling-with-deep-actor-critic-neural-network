@@ -1,12 +1,11 @@
-Job-Shop Scheduling Environment [![Build Status](https://travis-ci.com/prosysscience/JSSEnv.svg?token=bPABRGzbzQ2JTRTjgRJn&branch=master)](https://travis-ci.com/prosysscience/JSSEnv)
-==============================
+Final Year Project - Dynamic Job-Shop Scheduling Environment 
 
 An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Scheduling Problem
 
 ![til](./tests/ta01.gif)
 
 Getting Started
----
+------------
 
 This repository is available as a pip package:
 
