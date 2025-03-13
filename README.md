@@ -6,7 +6,7 @@ An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Schedulin
 ![til](./tests/ta01.gif)
 
 Getting Started
-------------
+---
 
 This repository is available as a pip package:
 
