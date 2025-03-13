@@ -18,12 +18,11 @@ I have implemented 3 most common dispatching rule in my dynamic JSSP environment
 ### Number of tardy jobs
 ------------
 The dynamic job scheduling environment is characteristed by these parameters: 
-number of machines = 6
-maximum allowable jobs = 25
-processing time = [50,60]
-allowable number of operation per job = [5,6]
-due date tightness, alpha = [10,12]
-
+- **Number of Machines**: `6`
+- **Maximum Allowable Jobs**: `25`
+- **Processing Time Range**: `[50, 60]`
+- **Allowable Number of Operations per Job**: `[5, 6]`
+- **Due Date Tightness (α)**: `[10, 12]`
 The variation between each variable are kept minimum to allow for a more stable result. 
 
 | action_type | Number of Episode | Number of tardy jobs in percentage | 
