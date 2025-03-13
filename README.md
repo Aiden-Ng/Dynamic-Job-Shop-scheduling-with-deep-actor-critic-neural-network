@@ -15,9 +15,11 @@ I have implemented 3 most common dispatching rule in my dynamic JSSP environment
 1. First in first out (FIFO)
 
  ![GIF not loaded](./(GITHUB)%20Graphs/result_FIFO_schedule.gif)
+
 2. S/RPT + SPT (Job Slack/Remaining Processing Time) combined with Shortest Processing Time
 
  ![GIF not loaded](./(GITHUB)%20Graphs/result_S_RPT_schedule.gif)
+
 3. Most Total Work Remaining (MTWR)
 
  ![GIF not loaded](./(GITHUB)%20Graphs/result_MWTR_schedule.gif)
@@ -49,22 +51,30 @@ In this table for multiple episodes, S_RPT + SPT is the best in reducing number 
 ### Makespan plotted on Kernal Density Estimation (KDE) for multiple EPISODES
 ------------
 1. FIFO with 1000 episode
-<img src="./(GITHUB) Graphs/2025-03-13_18-17-53_FIFO_1000_makespan_kdeplot.png" width="60%" height="60%"/>
+
+ <img src="./(GITHUB) Graphs/2025-03-13_18-17-53_FIFO_1000_makespan_kdeplot.png" width="60%" height="60%"/>
+
 2. S_RPT + SPT with 1000 episode
-<img src="./(GITHUB) Graphs/2025-03-13_18-30-17_S_RPT_1000_makespan_kdeplot.png" width="60%" height="60%"/>
+
+ <img src="./(GITHUB) Graphs/2025-03-13_18-30-17_S_RPT_1000_makespan_kdeplot.png" width="60%" height="60%"/>
+
 3. MTWR with 1000 episode
 
 For 1000 episode, MTWR effective reduces makespan when compared with FIFO, but it performs similar as compared to S_RPT + SPT.
 
  <img src="./(GITHUB) Graphs/2025-03-13_18-40-25_MTWR_1000_makespan_kdeplot.png" width="60%" height="60%"/>
 
-5. FIFO with 3000 episode
-<img src="./(GITHUB) Graphs/2025-03-13_19-10-34_FIFO_3000_makespan_kdeplot.png" width="60%" height="60%"/>
-6. S_RPT + SPT with 3000 episode
-<img src="./(GITHUB) Graphs/2025-03-14_01-10-10_S_RPT_3000_makespan_kdeplot.png" width="60%" height="60%"/>
-7. MTWR with 3000 episode
+4. FIFO with 3000 episode
+
+ <img src="./(GITHUB) Graphs/2025-03-13_19-10-34_FIFO_3000_makespan_kdeplot.png" width="60%" height="60%"/>
+
+5. S_RPT + SPT with 3000 episode
+
+ <img src="./(GITHUB) Graphs/2025-03-14_01-10-10_S_RPT_3000_makespan_kdeplot.png" width="60%" height="60%"/>
+6. MTWR with 3000 episode
 
 For 3000 episodes, this MTWR dominates both FIFO and S_RPT + SPT
+
  <img src="./(GITHUB) Graphs/2025-03-14_01-57-23_MTWR_3000_makespan_kdeplot.png" width="60%" height="60%"/>
 
 ### Conclusion
