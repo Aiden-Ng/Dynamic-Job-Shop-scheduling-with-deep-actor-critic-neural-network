@@ -7,24 +7,6 @@ An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Schedulin
 Getting Started
 ------------
 
-This repository is available as a pip package:
-
-```shell
-pip install JSSEnv
-```
-
-Once installed, the environment will be available in your OpenAi's gym environment and can be used to train a reinforcement learning agent:
-
-```python
-import gym
-import JSSEnv # an ongoing issue with OpenAi's gym causes it to not import automatically external modules, see: https://github.com/openai/gym/issues/2809
-# for older version of gym, you have to use 
-# env = gym.make('JSSEnv:jss-v1', env_config={'instance_path': 'INSTANCE_PATH'})
-env = gym.make('jss-v1', env_config={'instance_path': 'INSTANCE_PATH'})
-```
-
-### Important: Your instance must follow [Taillard's specification](http://jobshop.jjvh.nl/explanation.php#taillard_def). 
-
 
 How To Use
 ------------
@@ -75,9 +57,6 @@ Project Organization
                                  legal in our environment.
 --------
 
-## Question/Need Support?
-
-Open an issue, we will do our best to answer it.
 
 ## License
 
