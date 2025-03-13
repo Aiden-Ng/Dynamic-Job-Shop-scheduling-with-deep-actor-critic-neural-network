@@ -3,11 +3,12 @@ An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Schedulin
 
 ## Results 
 ------------
+### Gif (Just demonstration for each dispatching rule)
 I have implemented 3 most common dispatching rule in my dynamic JSSP environment. 
 
 ### Makespan
 1. First in first out (FIFO)
-![GIF not loaded](./result_FIFO_schedule.gif)
+<img src="./result_FIFO_schedule.gif" width="250" height="250"/>
 
 3. S/RPT + SPT (Job Slack/Remaining Processing Time) combined with Shortest Processing Time
 ![GIF not loaded](./result_S_RPT_schedule.gif)
