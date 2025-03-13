@@ -7,6 +7,7 @@ An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Schedulin
 I have implemented 3 most common dispatching rule in my dynamic JSSP environment. 
 
 ### Makespan
+------------
 1. First in first out (FIFO)
 ![GIF not loaded](./result_FIFO_schedule.gif)
 2. S/RPT + SPT (Job Slack/Remaining Processing Time) combined with Shortest Processing Time
@@ -15,7 +16,17 @@ I have implemented 3 most common dispatching rule in my dynamic JSSP environment
 ![GIF not loaded](./result_MWTR_schedule.gif)
 
 ### Number of tardy jobs
-| Method | Number of Episode | Number of tardy jobs in percentage | 
+------------
+The dynamic job scheduling environment is characteristed by these parameters: 
+number of machines = 6
+maximum allowable jobs = 25
+processing time = [50,60]
+allowable number of operation per job = [5,6]
+due date tightness, alpha = [10,12]
+
+The variation between each variable are kept minimum to allow for a more stable result. 
+
+| action_type | Number of Episode | Number of tardy jobs in percentage | 
 | ------------- | ------------- | ------------- | 
 | FIFO  | Content Cell  |
 | S_RPT + SPT  | Content Cell  |
