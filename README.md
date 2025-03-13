@@ -1,6 +1,10 @@
 # Final Year Project - Dynamic Job-Shop Scheduling Environment 
 An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Scheduling Problem
 
+## Disclaimer 
+------------
+For my Prof or PHD student looking at my repo, do note that I add on an additional decorator on top of the existing static JSSP environment which was developed by someone else so that it is able to acomodate dynamic job arrival. However, I soon realised that testing and benchmark can only be carried out either with many episodes (maybe >10k episodes) due to the randomly arriving nature of the job. Therefore, for this instance, a static jssp will be used to serve as a foundation to benchmark these existing dispatching rule and potientially deep MARL actor crtic agent in the initial phase. Once the deep MARL agent is set up, we shall apply it to the dynamic JSSP environment.
+
 ## Results 
 ------------
 ### Gif (Just demonstration for each dispatching rule)
@@ -35,9 +39,31 @@ The variation between each variable are kept minimum to allow for a more stable 
 | FIFO  | 3000 | 9.8% |
 | S_RPT + SPT  | 3000 | 4.0% |
 | MTWR  | 3000  | 6.6% | 
+In this table for multiple episodes, S_RPT + SPT is the best in reducing number of tardy jobs. 
+
 
 ### Makespan 
-<img src="/images/output/video1.gif" width="250" height="250"/>
+------------
+1. FIFO with 1000 episode
+<img src="./(GITHUB) Graphs/2025-03-13_18-17-53_FIFO_1000_makespan_kdeplot.png" width="60%" height="60%"/>
+2. S_RPT + SPT with 1000 episode
+<img src="./(GITHUB) Graphs/2025-03-13_18-30-17_S_RPT_1000_makespan_kdeplot.png" width="60%" height="60%"/>
+3. MTWR with 1000 episode
+<img src="./(GITHUB) Graphs/2025-03-13_18-40-25_MTWR_1000_makespan_kdeplot.png" width="60%" height="60%"/>
+
+4. FIFO with 3000 episode
+<img src="./(GITHUB) Graphs/2025-03-13_19-10-34_FIFO_3000_makespan_kdeplot.png" width="60%" height="60%"/>
+5. S_RPT + SPT with 3000 episode
+<img src="./(GITHUB) Graphs/2025-03-14_01-10-10_S_RPT_3000_makespan_kdeplot.png" width="60%" height="60%"/>
+6. MTWR with 3000 episode
+<img src="./(GITHUB) Graphs/2025-03-14_01-57-23_MTWR_3000_makespan_kdeplot.png" width="60%" height="60%"/>
+
+### Conclusion
+S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. MTWR is chosen because it is able to reduce the makespan of the jobs. Therefore, an deep MARL trained on these two objective will be used to benchmark against these existing dispatching rule.
+
+### YET TO DO 
+1. Design policy objective function (Current objective)
+2. Algorithm chosen is actor critic framework for RL
 
 ## Project Organization
 ------------
