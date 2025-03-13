@@ -52,7 +52,8 @@ In this table for multiple episodes, S_RPT + SPT is the best in reducing number 
 3. MTWR with 1000 episode
 
 Note that MTWR effective reduces makespan when compared with FIFO, but it performs similar as compared to S_RPT + SPT 
-<img src="./(GITHUB) Graphs/2025-03-13_18-40-25_MTWR_1000_makespan_kdeplot.png" width="60%" height="60%"/>
+
+ <img src="./(GITHUB) Graphs/2025-03-13_18-40-25_MTWR_1000_makespan_kdeplot.png" width="60%" height="60%"/>
 
 5. FIFO with 3000 episode
 <img src="./(GITHUB) Graphs/2025-03-13_19-10-34_FIFO_3000_makespan_kdeplot.png" width="60%" height="60%"/>
@@ -60,8 +61,8 @@ Note that MTWR effective reduces makespan when compared with FIFO, but it perfor
 <img src="./(GITHUB) Graphs/2025-03-14_01-10-10_S_RPT_3000_makespan_kdeplot.png" width="60%" height="60%"/>
 7. MTWR with 3000 episode
 
-FOr 3000 episodes, this MTWR dominates both FIFO and S_RPT + SPT
-<img src="./(GITHUB) Graphs/2025-03-14_01-57-23_MTWR_3000_makespan_kdeplot.png" width="60%" height="60%"/>
+For 3000 episodes, this MTWR dominates both FIFO and S_RPT + SPT
+ <img src="./(GITHUB) Graphs/2025-03-14_01-57-23_MTWR_3000_makespan_kdeplot.png" width="60%" height="60%"/>
 
 ### Conclusion
 S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. MTWR is chosen because it is able to reduce the makespan of the jobs. Therefore, an deep MARL trained on these two objective will be used to benchmark against these existing dispatching rule.
