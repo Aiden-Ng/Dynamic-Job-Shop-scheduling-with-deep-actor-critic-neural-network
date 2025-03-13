@@ -8,7 +8,8 @@ For my Prof or PHD student looking at my repo, do note that I added an additiona
 ## Results 
 ------------
 ### Gif (Just demonstration for each dispatching rule)
-I have implemented 3 most common dispatching rule in my dynamic JSSP environment. 
+I have implemented 3 most common dispatching rule in my dynamic JSSP environment, which will be used to benchmark against the deep multi agent reinforcement learning (MARL).
+The objective of the deep MARL would be to minimize number of tardy jobs and makespan in a batch.
 
 ### Example of each dispatching rule per EPISODE
 ------------
