@@ -11,9 +11,9 @@ I have implemented 3 most common dispatching rule in my dynamic JSSP environment
 1. First in first out (FIFO)
 ![GIF not loaded](./(GITHUB)%20Graphs/result_FIFO_schedule.gif)
 2. S/RPT + SPT (Job Slack/Remaining Processing Time) combined with Shortest Processing Time
-![GIF not loaded](./result_S_RPT_schedule.gif)
+![GIF not loaded](./(GITHUB)%20Graphs/result_S_RPT_schedule.gif)
 3. Most Total Work Remaining (MTWR)
-![GIF not loaded](./result_MWTR_schedule.gif)
+![GIF not loaded](./(GITHUB)%20Graphs/result_MWTR_schedule.gif)
 
 ### DJSSP environment configuration
 ------------
