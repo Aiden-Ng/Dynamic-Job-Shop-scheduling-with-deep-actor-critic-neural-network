@@ -8,12 +8,13 @@ I have implemented 3 most common dispatching rule in my dynamic JSSP environment
 
 ### Makespan
 1. First in first out (FIFO)
-<img src="./result_FIFO_schedule.gif" width="75%" height="75%"/> 
+<img src="./result_FIFO_schedule.gif" width="75%" height="75%"/>
 
-3. S/RPT + SPT (Job Slack/Remaining Processing Time) combined with Shortest Processing Time
+
+2. S/RPT + SPT (Job Slack/Remaining Processing Time) combined with Shortest Processing Time
 ![GIF not loaded](./result_S_RPT_schedule.gif)
 
-5. Most Total Work Remaining (MTWR)
+3. Most Total Work Remaining (MTWR)
 ![GIF not loaded](./result_MWTR_schedule.gif)
 
 ### Number of tardy jobs
