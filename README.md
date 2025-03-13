@@ -1,4 +1,4 @@
-Final Year Project - Dynamic Job-Shop Scheduling Environment 
+# Final Year Project - Dynamic Job-Shop Scheduling Environment 
 
 An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Scheduling Problem
 
