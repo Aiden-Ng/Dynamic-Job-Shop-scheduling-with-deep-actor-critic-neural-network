@@ -6,10 +6,10 @@ An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Schedulin
 ### Gif (Just demonstration for each dispatching rule)
 I have implemented 3 most common dispatching rule in my dynamic JSSP environment. 
 
-### Example of each dispatching rule per *episode*
+### Example of each dispatching rule per EPISODE
 ------------
 1. First in first out (FIFO)
-![GIF not loaded](./result_FIFO_schedule.gif)
+![GIF not loaded](./(GITHUB) Graphs/result_FIFO_schedule.gif)
 2. S/RPT + SPT (Job Slack/Remaining Processing Time) combined with Shortest Processing Time
 ![GIF not loaded](./result_S_RPT_schedule.gif)
 3. Most Total Work Remaining (MTWR)
@@ -36,7 +36,10 @@ The variation between each variable are kept minimum to allow for a more stable 
 | S_RPT + SPT  | 3000 | 4.0% |
 | MTWR  | 3000  | 6.6% | 
 
-Project Organization
+### Makespan 
+<img src="/images/output/video1.gif" width="250" height="250"/>
+
+## Project Organization
 ------------
 
     ├── README.md             <- The top-level README for developers using this project.
