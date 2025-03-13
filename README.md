@@ -21,6 +21,12 @@ I have implemented 3 most common dispatching rule in my dynamic JSSP environment
 | FIFO  | Content Cell  |
 | S_RPT + SPT  | Content Cell  |
 | MTWR  | Content Cell  |
+| FIFO  | Content Cell  |
+| S_RPT + SPT  | Content Cell  |
+| MTWR  | Content Cell  |
+| FIFO  | Content Cell  |
+| S_RPT + SPT  | Content Cell  |
+| MTWR  | Content Cell  |
 
 
 Project Organization
