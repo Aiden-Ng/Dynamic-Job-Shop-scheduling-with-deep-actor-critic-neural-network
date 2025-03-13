@@ -3,7 +3,7 @@ An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Schedulin
 
 ## Disclaimer 
 ------------
-For my Prof or PHD student looking at my repo, do note that I add on an additional decorator on top of the existing static JSSP environment which was developed by someone else so that it is able to acomodate dynamic job arrival. However, I soon realised that testing and benchmark can only be carried out either with many episodes (maybe >10k episodes) due to the randomly arriving nature of the job. Therefore, for this instance, a static jssp will be used to serve as a foundation to benchmark these existing dispatching rule and potientially deep MARL actor crtic agent in the initial phase. Once the deep MARL agent is set up, we shall apply it to the dynamic JSSP environment.
+For my Prof or PHD student looking at my repo, do note that I added an additional dynamic scheduling decorator that I made on top of the existing static JSSP environment which was developed by someone else so that it is able to acomodate dynamic job arrival. However, I soon realised that testing and benchmark can only be carried out either with many episodes (maybe >10k episodes) for the dynamic environment due to the randomly arriving nature of the job. Therefore, for this instance, a static jssp will be used to serve as a foundation to benchmark these existing dispatching rule and potientially deep MARL actor crtic agent at the initial phase. Once the deep MARL agent is set up, we shall apply it to the dynamic JSSP environment and benchmark these dispatching rule deep MARL with many episodes.
 
 ## Results 
 ------------
@@ -31,6 +31,7 @@ The variation between each variable are kept minimum to allow for a more stable 
 
 ### Number of tardy jobs
 ------------
+In this table for multiple episodes, S_RPT + SPT is the best in reducing number of tardy jobs. 
 | action_type | Number of Episode | Number of tardy jobs in percentage | 
 | ------------- | ------------- | ------------- | 
 | FIFO  | 1000 | 10.2% |
@@ -39,23 +40,25 @@ The variation between each variable are kept minimum to allow for a more stable 
 | FIFO  | 3000 | 9.8% |
 | S_RPT + SPT  | 3000 | 4.0% |
 | MTWR  | 3000  | 6.6% | 
-In this table for multiple episodes, S_RPT + SPT is the best in reducing number of tardy jobs. 
 
 
-### Makespan 
+
+### Makespan plotted on Kernal Density Estimation (KDE) for multiple EPISODES
 ------------
 1. FIFO with 1000 episode
 <img src="./(GITHUB) Graphs/2025-03-13_18-17-53_FIFO_1000_makespan_kdeplot.png" width="60%" height="60%"/>
 2. S_RPT + SPT with 1000 episode
 <img src="./(GITHUB) Graphs/2025-03-13_18-30-17_S_RPT_1000_makespan_kdeplot.png" width="60%" height="60%"/>
 3. MTWR with 1000 episode
+Note that MTWR effective reduces makespan when compared with FIFO, but it performs similar as compared to S_RPT + SPT 
 <img src="./(GITHUB) Graphs/2025-03-13_18-40-25_MTWR_1000_makespan_kdeplot.png" width="60%" height="60%"/>
 
-4. FIFO with 3000 episode
+5. FIFO with 3000 episode
 <img src="./(GITHUB) Graphs/2025-03-13_19-10-34_FIFO_3000_makespan_kdeplot.png" width="60%" height="60%"/>
-5. S_RPT + SPT with 3000 episode
+6. S_RPT + SPT with 3000 episode
 <img src="./(GITHUB) Graphs/2025-03-14_01-10-10_S_RPT_3000_makespan_kdeplot.png" width="60%" height="60%"/>
-6. MTWR with 3000 episode
+7. MTWR with 3000 episode
+FOr 3000 episodes, this MTWR dominates both FIFO and S_RPT + SPT
 <img src="./(GITHUB) Graphs/2025-03-14_01-57-23_MTWR_3000_makespan_kdeplot.png" width="60%" height="60%"/>
 
 ### Conclusion
