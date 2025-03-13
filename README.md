@@ -4,8 +4,14 @@ An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Schedulin
 
 ![til](./tests/ta01.gif)
 
-Getting Started
+Results 
 ------------
+I have implemented 3 most common dispatching rule in my dynamic JSSP environment. 
+1. First in first out (FIFO)
+
+2. S/RPT + SPT (Job Slack/Remaining Processing Time) combined with Shortest Processing Time
+
+3. Most Total Work Remaining (MTWR)
 
 Project Organization
 ------------
