@@ -49,7 +49,8 @@ In this table for multiple episodes, S_RPT + SPT is the best in reducing number 
 <img src="./(GITHUB) Graphs/2025-03-13_18-17-53_FIFO_1000_makespan_kdeplot.png" width="60%" height="60%"/>
 2. S_RPT + SPT with 1000 episode
 <img src="./(GITHUB) Graphs/2025-03-13_18-30-17_S_RPT_1000_makespan_kdeplot.png" width="60%" height="60%"/>
-3. MTWR with 1000 episode\n
+3. MTWR with 1000 episode
+
 Note that MTWR effective reduces makespan when compared with FIFO, but it performs similar as compared to S_RPT + SPT 
 <img src="./(GITHUB) Graphs/2025-03-13_18-40-25_MTWR_1000_makespan_kdeplot.png" width="60%" height="60%"/>
 
@@ -58,6 +59,7 @@ Note that MTWR effective reduces makespan when compared with FIFO, but it perfor
 6. S_RPT + SPT with 3000 episode
 <img src="./(GITHUB) Graphs/2025-03-14_01-10-10_S_RPT_3000_makespan_kdeplot.png" width="60%" height="60%"/>
 7. MTWR with 3000 episode
+
 FOr 3000 episodes, this MTWR dominates both FIFO and S_RPT + SPT
 <img src="./(GITHUB) Graphs/2025-03-14_01-57-23_MTWR_3000_makespan_kdeplot.png" width="60%" height="60%"/>
 
