@@ -1,22 +1,9 @@
 Job-Shop Scheduling Environment [![Build Status](https://travis-ci.com/prosysscience/JSSEnv.svg?token=bPABRGzbzQ2JTRTjgRJn&branch=master)](https://travis-ci.com/prosysscience/JSSEnv)
 ==============================
 
-An optimized OpenAi gym's environment to simulate the [Job-Shop Scheduling problem](https://developers.google.com/optimization/scheduling/job_shop).
+An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Scheduling Problem
 
 ![til](./tests/ta01.gif)
-
-If you've found our work useful for your research, you can cite the [paper](https://arxiv.org/abs/2104.03760) as follows:
-
-```
-@misc{tassel2021reinforcement,
-      title={A Reinforcement Learning Environment For Job-Shop Scheduling}, 
-      author={Pierre Tassel and Martin Gebser and Konstantin Schekotihin},
-      year={2021},
-      eprint={2104.03760},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
-}
-```
 
 Getting Started
 ------------
