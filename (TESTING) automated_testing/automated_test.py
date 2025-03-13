@@ -4,22 +4,22 @@ from enum import Enum
 from datetime import datetime
 import os
 from pathlib import Path
-"""
-Version 1.0.0
-1. This is the automated test script to run the environment
-"""
+
 #how to get the files working directory
-RL_environment_dir = (Path(__file__).parent / "..").resolve()
-RL_environment_ABS_FILE_PATH = f"{RL_environment_dir}\\RL_environment.py"
+RL_environment_ABS_FILE_PATH = (Path(__file__).parent / ".." / "RL_environment.py").resolve()
 
 class action_type(Enum):
     FIFO = 1
     S_RPT = 2
-    MWTR = 3
+    MTWR = 3
 
 #creating the parser object
-EPISODE_LIST = [500,1000,3000]
-ACTION_TYPE_LIST = [action_type.FIFO, action_type.S_RPT, action_type.MWTR]
+# EPISODE_LIST = [1]
+EPISODE_LIST = [3000]
+# EPISODE_LIST = [1]
+
+ACTION_TYPE_LIST = [action_type.S_RPT, action_type.MTWR]
+# ACTION_TYPE_LIST = [action_type.FIFO]
 
 def call_test(episode_args, action_type_args = None):
     try:

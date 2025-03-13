@@ -81,8 +81,8 @@ class JssEnv(gym.Env):
         self.machines = 6
         self.min_proc_time = 50 #minimum processing time
         self.max_proc_time = 60 #maximum processing time
-        self.operation_num_min = 5 #minimum number of operations for each jobs
-        self.operation_num_max = 6 #maximum number of operations for each jobs
+        self.operation_num_min = 8 #minimum number of operations for each jobs
+        self.operation_num_max = 9 #maximum number of operations for each jobs
         #self.jobs is already initialized above
         
         #changed by dyanmic scheduling
@@ -92,6 +92,7 @@ class JssEnv(gym.Env):
         #initialize the variable required for action selection S/RPT + SPT dispatching rule
         self.due_date_jobs = [] #must be dynamic
         self.allowance_jobs = []
+        self.flow_time = []
         self.slack_jobs = []
         
         self.makespan = 0 #this is a singular value
@@ -168,6 +169,7 @@ class JssEnv(gym.Env):
         #additional variables
         self.due_date_jobs = np.zeros(self.jobs, dtype=int) 
         self.allowance_jobs = np.zeros(self.jobs, dtype=int) 
+        self.flow_time = np.zeros(self.jobs, dtype=int)
         self.slack_jobs = np.zeros(self.jobs, dtype=int) 
         self.time_taken_to_proc_all_jobs = np.zeros(self.jobs, dtype=int) 
         self.jobs = 0 #reset the number of jobs

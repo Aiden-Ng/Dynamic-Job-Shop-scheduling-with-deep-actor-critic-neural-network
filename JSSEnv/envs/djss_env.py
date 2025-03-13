@@ -4,6 +4,7 @@ import numpy as np
 import os
 from enum import Enum
 from .jss_env1 import JssEnv #if u want to debug from here remove the . from .jss_env1
+from pathlib import Path
 
 #this is for manually job arrival
 import itertools
@@ -14,7 +15,7 @@ Version : 1.03.0
 Date: 10/03/2025
 
 Note:
-1. Added the MWTR dispatching rule
+1. Added the MTWR dispatching rule
 2. Change the get_action function to accomodate differnet dispatching rule
 
 Future Works:
@@ -25,19 +26,19 @@ Future Works:
 class action_type(Enum):
     FIFO = 1
     S_RPT = 2
-    MWTR = 3
+    MTWR = 3
 
 class Debug():
     def __init__(self):
         self.modified_due_date_per_operation = np.array([])
         self.SRPT_ratio = np.array([])
-        self.MWTR_ratio = np.array([])
-        self.MWTR_max = 0
+        self.MTWR_ratio = np.array([])
+        self.MTWR_max = 0
         self.index = 0
 
         #debug for file reading
         self.row = 0
-        self.job_file = r"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\(DEBUG)\dj1"
+        self.job_file = (Path(__file__).parent / ".." / ".." / "(DEBUG)" / "dj1").resolve()
 
 class DynamicJssEnv(JssEnv):
     def __init__(self, env_config=None, render_mode=None):
@@ -57,7 +58,10 @@ class DynamicJssEnv(JssEnv):
         
         self.job_arrival_times = {job: 0 for job in range(self.jobs)} #DEBUG, not really usefull because assuming no initial jobs
         self.jobs = len(self.instance_matrix)  # New jobs will have IDs starting from here
-        self.max_jobs = 5 #set the max number of jobs allowable
+        self.max_jobs = 25 #set the max number of jobs allowable
+        self.alpha_list = [] #this is for the alpha list
+        self.alpha = 0 #this sets the job tightness date
+        
 
     def generate_new_job(self):
         #depends if you want dynamic job generation or files
@@ -117,13 +121,17 @@ class DynamicJssEnv(JssEnv):
 
         # ================= PLEASE DEBUG THIS SECTION ================= 
         #add the due date based on proportion of total work (TWK)
-        alpha = 3 #this is the proportion of total work
-        due_date =  self.current_time_step + (total_time) * alpha
-        allowance = (total_time) * alpha
+        self.alpha_list = [10,12]
+        self.alpha = random.randint(self.alpha_list[0],self.alpha_list[1]) #this is for 20 jobs
+        # self.alpha = random.randint(20,23) #this is for 60 jobs
+
+        due_date =  self.current_time_step + (total_time) * self.alpha
+        allowance = (total_time) * self.alpha
         slack = allowance - total_time #total time refers to total processing of the job
         
         self.due_date_jobs = np.append(self.due_date_jobs, due_date)
         self.allowance_jobs = np.append(self.allowance_jobs, allowance) #DEBUG, not sure what this does
+        self.flow_time = np.append(self.flow_time, allowance) #this is because self.allowance changes but not flowtime
         self.slack_jobs = np.append(self.slack_jobs, slack) #DEBUG, not sure what this does
         # ================= PLEASE DEBUG THIS SECTION =================
 
@@ -169,13 +177,20 @@ class DynamicJssEnv(JssEnv):
                 
                 #get the current processing time at each job's tims step
                 #if condition is used to handle when the job is done so that the index does not overflow
-                current_processing_time = [
+                current_processing_time = np.array([
                 0 if self.todo_time_step_job[job] == len(self.instance_matrix[job]) #this is to handle the case where the job is done then processing time = 0
                 else self.instance_matrix[job][self.todo_time_step_job[job]][1]
-                for job in range(len(self.instance_matrix))]
+                for job in range(len(self.instance_matrix))])
 
-                SPRT_ratio_current_processing_time = SRPT_ratio * current_processing_time #get the processing time of the SRPT_ratio_compare
-                SRPT_ratio_compare_current_processing_time = SRPT_ratio_compare * current_processing_time #get the processing time of the SRPT_ratio_compare
+                # no need to do filtering here because the illegal actions will be filtered by modified_due_date_per_operation
+                due_date_for_kth_operation =np.where( 
+                    self.legal_actions[:-1].astype(bool), #only calculate for legal actions, because it will be wrong for non legal_actions
+                    self.total_perform_op_time_jobs + current_processing_time, #get the due date for the kth operation
+                    np.nan)
+
+                #debug
+                SPRT_ratio_current_processing_time = SRPT_ratio * due_date_for_kth_operation #get the processing time of the SRPT_ratio_compare
+                SRPT_ratio_compare_current_processing_time = SRPT_ratio_compare * due_date_for_kth_operation #get the processing time of the SRPT_ratio_compare
 
                 # Use np.where() instead of np.maximum()
                 modified_due_date_per_operation = np.where(
@@ -195,16 +210,16 @@ class DynamicJssEnv(JssEnv):
             else:
                 assert False, "Error"
 
-        elif action_type_args.value == action_type.MWTR.value:
+        elif action_type_args.value == action_type.MTWR.value:
             if self.legal_actions[:-1].sum() != 0:
                 remaining_processing_time = self.jobs_length - self.total_perform_op_time_jobs
                 
-                MWTR_ratio = np.where(
+                MTWR_ratio = np.where(
                                         self.legal_actions[:-1].astype(bool),  # If True (masked), then compute the max, else return np.nan
-                                        remaining_processing_time / self.jobs_length,
+                                        remaining_processing_time,
                                         np.nan)
 
-                index = np.nanargmax(MWTR_ratio)
+                index = np.nanargmax(MTWR_ratio)
                 return index
                 
             elif self.legal_actions.sum() == 1:
@@ -218,9 +233,12 @@ class DynamicJssEnv(JssEnv):
         # With 10% probability, generate a new job.
         # if random.random() < 1: #make it generate new job for everystep
         if (len(self.instance_matrix) < self.max_jobs): 
-            new_job = self.generate_new_job()
-            if self.job_arrival_times[new_job] <= self.current_time_step: #DEBUG, not sure what this does
-                self.legal_actions[new_job] = 1 #DEBUG, not sure what this does
+            for i in range(10):
+                new_job = self.generate_new_job()
+                #if self.job_arrival_times[new_job] <= self.current_time_step: #DEBUG, not sure what this does
+                    #self.legal_actions[new_job] = 1 #DEBUG, not sure what this does
+                if (len(self.instance_matrix) >= self.max_jobs): #DEBUG, not
+                    break
         
         action = self.get_action(action_type[action_type_args]) #this is dispatching rule action mechanism
 
@@ -239,7 +257,7 @@ if __name__ == '__main__':
             legal_actions = obs["action_mask"]
             # p = (legal_actions / legal_actions.sum()) #legal action got problem
             # actions = np.random.choice(len(legal_actions), 1, p=(legal_actions / legal_actions.sum()) )[0] #how is it possible to take NOACTION
-            obs, rewards, done, _ = env.step("MWTR") #this goes to the step function inside the djss_env, not the jsse_env
+            obs, rewards, done, _ = env.step("S_RPT") #this goes to the step function inside the djss_env, not the jsse_env
             cum_reward += rewards
         print(f"Cumulative reward: {cum_reward}")
 

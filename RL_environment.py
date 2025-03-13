@@ -22,8 +22,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-#initialise global variables
-INSTANCE_PATH = r"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\JSSEnv\envs\instances\ta01"
+#initialise global variable
 images = [] #creates the image for the gif
 #for graphing the results
 total_jobs = 0
@@ -33,7 +32,7 @@ total_number_of_tardy_job = 0
 class action_type(Enum):
     FIFO = 1
     S_RPT = 2
-    MWTR = 3
+    MTWR = 3
 
 #create argparser object to handle the variables from the automated_test.py
 parser = argparse.ArgumentParser(description='Automated test script to run the environment')
@@ -41,10 +40,10 @@ parser.add_argument("--episode", help = "specifies the number of episode to run"
 parser.add_argument("--action_type", help = "[action_type.RANDOM, action_type.S_RPT, action_type.MTWR]", type = str)
 parser.add_argument("--logging_xlsx_path", help = "this is the absolute path for the excel file for logging", type = str)
 args = parser.parse_args()
-args.logging_xlsx_path = r"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\(TESTING) automated_testing\automated_test_log.xlsx"
-# args.episode = 100
+args.logging_xlsx_path = (Path(__file__).parent / "(TESTING) automated_testing" / "automated_test_log.xlsx" ).resolve()
+# args.episode = 1
 # args.action_type = "S_RPT"
-# args.action_type = "MWTR"
+# args.action_type = "MTWR"
 # args.action_type = "FIFO"
 
 def logging_to_xslx(tardy_ratio_args):
@@ -56,7 +55,8 @@ def logging_to_xslx(tardy_ratio_args):
         ws.append([Timestamp, 
                    args.episode, 
                    args.action_type, 
-                   tardy_ratio_args, 
+                   tardy_ratio_args,
+                   str(env.alpha_list), 
                    env.machines, 
                    env.max_jobs, 
                    env.min_proc_time, 
@@ -74,13 +74,22 @@ def logging_to_xslx(tardy_ratio_args):
 def saving_to_png():
     plt.figure(figsize=(10,6))
     sns.lineplot(x = "makespan", y = "makespan_count", data = makespan_df, marker='o')
-    plt.ylim(0, 0.4*args.episode)
+    plt.ylim(0, max(50,0.1*args.episode))
     plt.xlim(0, 1200)
     str_format = "%Y-%m-%d_%H-%M-%S"
     # plt.savefig(f"C:\\Users\\Ng Hong Xi\\OneDrive\\NTU Documents\\Y4S1\\Final Year Project\\Code\\JSSP_Env\\(TESTING) automated_testing\\{datetime.now().strftime(str_format)}_{args.action_type}_{args.episode}_makespan_barplot.png")
-    plt.savefig(rf"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\(TESTING) automated_testing\{datetime.now().strftime(str_format)}_{args.action_type}_{args.episode}_makespan_barplot.png")
-    
-    
+    plt.savefig(rf"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\(TESTING) automated_testing\(PLOT) makespan\{datetime.now().strftime(str_format)}_{args.action_type}_{args.episode}_makespan_barplot.png")
+
+def saving_to_kde():
+    plt.figure(figsize=(10,6))
+    sns.kdeplot(makespan_df["makespan"], color="blue", label="Dataset 1", fill=True)
+    plt.xlabel("Makespan")
+    plt.ylabel("Density")
+    plt.title("KDE Plot of Makespan Distributions")
+    plt.legend()
+    str_format = "%Y-%m-%d_%H-%M-%S"
+    plt.savefig(rf"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\(TESTING) automated_testing\(PLOT) makespan\{datetime.now().strftime(str_format)}_{args.action_type}_{args.episode}_makespan_kdeplot.png")
+
 
 if __name__ == "__main__":
     #creating pandas dataframe to store the win rate of tardy jobs
@@ -94,7 +103,7 @@ if __name__ == "__main__":
     ACTION_TYPE = args.action_type #changing action_type
 
     for episode in range(EPISODE):
-        env = gym.make('djss-v1',  env_config={'instance_path': INSTANCE_PATH})
+        env = gym.make('djss-v1')
         obs, info = env.reset(callback = env.generate_new_job)
         done = False
         print("=================programme starting=================")
@@ -109,9 +118,9 @@ if __name__ == "__main__":
             obs, reward, done, info = env.step(args.action_type)
 
             # 3. Render the current schedule as a Plotly figure
-            fig = env.render()  # This returns a Plotly figure.
+            # fig = env.render()  # This returns a Plotly figure.
             # fig.show()
-            print(type(fig))  # Ensure it's a valid Plotly figure
+            # print(type(fig))  # Ensure it's a valid Plotly figure
             print(env.instance_matrix)
 
             # # 4. Convert Plotly figure to an in-memory image
@@ -141,10 +150,12 @@ if __name__ == "__main__":
         env.close()
 
     logging_to_xslx(float(total_number_of_tardy_job)/float(total_jobs)) #open the excel file and write here
-    saving_to_png()
+    # saving_to_png()
+    saving_to_kde()
+
     # # 5. Save GIF
     # if images:
-    #     gif_path = r"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\schedule.gif"
+    #     gif_path = rf"C:\Users\Ng Hong Xi\OneDrive\NTU Documents\Y4S1\Final Year Project\Code\JSSP_Env\{args.action_type}_schedule.gif"
     #     imageio.mimsave(gif_path, images, fps=15)  # Adjust FPS as needed
     #     print(f"GIF saved as {gif_path}!")
     # else:
