@@ -8,7 +8,9 @@ I have implemented 3 most common dispatching rule in my dynamic JSSP environment
 
 ### Makespan
 1. First in first out (FIFO)
-<img src="./result_FIFO_schedule.gif" width="250" height="250"/>
+| Method | Number of Episode | Number of tardy jobs in percentage |
+| ------------- | ------------- | ------------- | 
+| <img src="./result_FIFO_schedule.gif" width="250" height="250"/>  | Content Cell  |
 
 3. S/RPT + SPT (Job Slack/Remaining Processing Time) combined with Shortest Processing Time
 ![GIF not loaded](./result_S_RPT_schedule.gif)
