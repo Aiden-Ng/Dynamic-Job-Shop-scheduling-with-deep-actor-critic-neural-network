@@ -6,7 +6,7 @@ An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Schedulin
 ### Gif (Just demonstration for each dispatching rule)
 I have implemented 3 most common dispatching rule in my dynamic JSSP environment. 
 
-### Makespan
+### Example of each dispatching rule per *episode*
 ------------
 1. First in first out (FIFO)
 ![GIF not loaded](./result_FIFO_schedule.gif)
@@ -15,7 +15,7 @@ I have implemented 3 most common dispatching rule in my dynamic JSSP environment
 3. Most Total Work Remaining (MTWR)
 ![GIF not loaded](./result_MWTR_schedule.gif)
 
-### Number of tardy jobs
+### DJSSP environment configuration
 ------------
 The dynamic job scheduling environment is characteristed by these parameters: 
 - **Number of Machines**: `6`
@@ -25,18 +25,16 @@ The dynamic job scheduling environment is characteristed by these parameters:
 - **Due Date Tightness (α)**: `[10, 12]`
 The variation between each variable are kept minimum to allow for a more stable result. 
 
+### Number of tardy jobs
+------------
 | action_type | Number of Episode | Number of tardy jobs in percentage | 
 | ------------- | ------------- | ------------- | 
-| FIFO  | Content Cell  |
-| S_RPT + SPT  | Content Cell  |
-| MTWR  | Content Cell  |
-| FIFO  | Content Cell  |
-| S_RPT + SPT  | Content Cell  |
-| MTWR  | Content Cell  |
-| FIFO  | Content Cell  |
-| S_RPT + SPT  | Content Cell  |
-| MTWR  | Content Cell  |
-
+| FIFO  | 1000 | 10.2% |
+| S_RPT + SPT  | 1000 | 3.8% |
+| MTWR  | 1000 | 6.7% | 
+| FIFO  | 3000 | 9.8% |
+| S_RPT + SPT  | 3000 | 4.0% |
+| MTWR  | 3000  | 6.6% | 
 
 Project Organization
 ------------
