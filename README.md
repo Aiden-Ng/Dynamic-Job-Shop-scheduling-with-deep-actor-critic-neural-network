@@ -76,6 +76,7 @@ For 1000 episode, MTWR effective reduces makespan when compared with FIFO, but i
 5. S_RPT + SPT with 3000 episode
 
  <img src="./(GITHUB) Graphs/2025-03-14_01-10-10_S_RPT_3000_makespan_kdeplot.png" width="60%" height="60%"/>
+ 
 6. MTWR with 3000 episode
 
 For 3000 episodes, this MTWR dominates both FIFO and S_RPT + SPT
