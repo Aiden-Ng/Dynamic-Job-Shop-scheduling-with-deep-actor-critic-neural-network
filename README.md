@@ -3,7 +3,11 @@ An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Schedulin
 
 ## Disclaimer 
 ------------
-For my Prof or PHD student looking at my repo, do note that I added an additional dynamic scheduling decorator that I made on top of the existing static JSSP environment which was developed by someone else. The dynamic scheduling decorator is a wrapper on top of the static JSSP class that allows the generation of dynamic job arrival. However, I soon realised that testing and benchmark can only be carried out either with many episodes (maybe >10k episodes) for the dynamic environment due to the randomly arriving nature of the job. Therefore, for this instance, a static jssp will be used to serve as a foundation to benchmark these existing dispatching rule and potientially deep MARL actor crtic agent at the initial phase. Once the deep MARL agent is set up, we shall apply it to the dynamic JSSP environment and benchmark these dispatching rule deep MARL with many episodes.
+For my professor or PhD student reviewing my repository, please note that I have added a dynamic scheduling decorator on top of the existing static JSSP environment, which was originally developed by someone else. The dynamic scheduling decorator is a wrapper around the static JSSP class that enables the generation of dynamically arriving jobs.
+
+However, I soon realized that testing and benchmarking in the dynamic environment require a large number of episodes (potentially more than 10,000) due to the randomness of job arrivals. Therefore, at this stage, a static JSSP will be used as a foundation for benchmarking existing dispatching rules and potentially a deep MARL (Multi-Agent Reinforcement Learning) actor-critic agent during the initial phase.
+
+Once the deep MARL agent is set up, it will be applied to the dynamic JSSP environment, where benchmarking will be conducted over many episodes to compare the deep MARL approach with existing dispatching rules.
 
 ## Results 
 ------------
