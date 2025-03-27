@@ -87,10 +87,10 @@ For 3000 episodes, this MTWR dominates both FIFO and S_RPT + SPT
 S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. MTWR is chosen because it is able to reduce the makespan of the jobs. Therefore, an deep MARL trained on these two objective will be used to benchmark against these existing dispatching rule.
 
 ### YET TO DO 
-1. Design policy objective function - still reviewing
-2. Implement single agent deep RL with actor critic (A3C) framework - either with SB3 or open source github
-3. Implment multi agent deep RL with acrtor critic (A3C)
-4. Benchmark with the dispatching rule (S_RPT + SPT) and MTWR
+1. Design reward function - in progress
+2. Implement single agent deep RL with actor critic (A2C) framework - with sb3 and tune hyperparameter with rl-baseline3zoo
+3. Implment multi agent deep RL with acrtor critic (A3C) - unable to do, will write certain reviews on this. Because implementing multiple actor critic requires the use of RLLib or PyTorch which is time intensive. 
+4. Benchmark the single A2C RL agent with the dispatching rule (S_RPT + SPT) and MTWR
 
 ## Project Organization
 ------------
