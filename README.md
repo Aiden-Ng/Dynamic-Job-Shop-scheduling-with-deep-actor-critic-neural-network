@@ -89,7 +89,7 @@ S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. 
 ### YET TO DO 
 1. Design reward function - in progress
 2. Implement single agent deep RL with actor critic (A2C) framework - with sb3 and tune hyperparameter with rl-baseline3zoo
-3. Implment multi agent deep RL with acrtor critic (A3C) - unable to do, will write certain reviews on this. Because implementing multiple actor critic requires the use of RLLib or PyTorch which is time intensive. 
+3. Implement multi agent deep RL with acrtor critic (A3C) - unable to do, will write certain reviews on this. Because implementing multiple actor critic requires the use of RLLib or PyTorch which is time intensive. 
 4. Benchmark the single A2C RL agent with the dispatching rule (S_RPT + SPT) and MTWR
 
 ## Project Organization
