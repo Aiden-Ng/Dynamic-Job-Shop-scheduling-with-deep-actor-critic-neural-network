@@ -12,13 +12,14 @@ class action_type(Enum):
     FIFO = 1
     S_RPT = 2
     MTWR = 3
+    A2C = 4
+
 
 #creating the parser object
-# EPISODE_LIST = [1]
-EPISODE_LIST = [5000]
-# EPISODE_LIST = [1]
+# EPISODE_LIST = [5000]
+EPISODE_LIST = [1000,3000,5000]
 
-ACTION_TYPE_LIST = [action_type.MTWR]
+ACTION_TYPE_LIST = [action_type.A2C, action_type.FIFO, action_type.S_RPT, action_type.MTWR]
 # ACTION_TYPE_LIST = [action_type.FIFO]
 
 def call_test(episode_args, action_type_args = None):
