@@ -3,8 +3,15 @@ import random
 import numpy as np
 import os
 from enum import Enum
-from .jss_env1 import JssEnv #if u want to debug from here remove the . from .jss_env1
+
+
+if __name__ == "__main__":
+    from jss_env1 import JssEnv #if u want to debug from here remove the . from .jss_env1
+else:
+    from .jss_env1 import JssEnv
+
 from pathlib import Path
+from typing import Optional
 
 #this is for manually job arrival
 import itertools
@@ -15,12 +22,9 @@ Version : 1.03.0
 Date: 10/03/2025
 
 Note:
-1. Added the MTWR dispatching rule
-2. Change the get_action function to accomodate differnet dispatching rule
-
+1. Since the sb3 and openai gym does not really support dynamic action_space, we will be using action_masking with large action_spaces
 Future Works:
-1. Able to pop the job once it done and align the index
-2. make rendering work
+
 """
 #this is for the action selection
 class action_type(Enum):
@@ -58,7 +62,6 @@ class DynamicJssEnv(JssEnv):
         
         self.job_arrival_times = {job: 0 for job in range(self.jobs)} #DEBUG, not really usefull because assuming no initial jobs
         self.jobs = len(self.instance_matrix)  # New jobs will have IDs starting from here
-        self.max_jobs = 25 #set the max number of jobs allowable
         self.alpha_list = [] #this is for the alpha list
         self.alpha = 0 #this sets the job tightness date
         
@@ -103,6 +106,7 @@ class DynamicJssEnv(JssEnv):
         self.max_time_jobs = max(self.jobs_length)
         arrival_time = self.current_time_step  #DEBUG, not sure why this is needed - or add a random delay
         self.job_arrival_times[self.jobs] = arrival_time #DEBUG, not sure why this is needed
+        self.jobs_completed = np.append(self.jobs_completed, 0) # this is a boolean to check if the job is completed, so that it will only receive reward once
 
         self.sum_op += total_time #get the total time of operation of all jobs
 
@@ -117,7 +121,7 @@ class DynamicJssEnv(JssEnv):
         self.idle_time_jobs_last_op = np.append(self.idle_time_jobs_last_op, 0)
         self.action_illegal_no_op = np.append(self.action_illegal_no_op, 0)
         self.illegal_actions = np.hstack([self.illegal_actions, np.full((self.machines, 1), 0,  dtype=int)])
-        self.state = np.vstack([self.state, np.zeros((1, 7), dtype=float)]) #7 different states
+        # self.state = np.vstack([self.state, np.zeros((1, 7), dtype=float)]) #7 different states
 
         # ================= PLEASE DEBUG THIS SECTION ================= 
         #add the due date based on proportion of total work (TWK)
@@ -127,12 +131,13 @@ class DynamicJssEnv(JssEnv):
 
         due_date =  self.current_time_step + (total_time) * self.alpha
         allowance = (total_time) * self.alpha
-        slack = allowance - total_time #total time refers to total processing of the job
+        slack = allowance  #total time refers to total processing of the job
         
         self.due_date_jobs = np.append(self.due_date_jobs, due_date)
         self.allowance_jobs = np.append(self.allowance_jobs, allowance) #DEBUG, not sure what this does
         self.flow_time = np.append(self.flow_time, allowance) #this is because self.allowance changes but not flowtime
         self.slack_jobs = np.append(self.slack_jobs, slack) #DEBUG, not sure what this does
+        self.allowance_over_slack = self.allowance_jobs / self.slack_jobs #this is to get the ratio of allowance over slack
         # ================= PLEASE DEBUG THIS SECTION =================
 
         #checking if machine is available, if yes then legal_actions = 1 else legal_actions = 0
@@ -157,6 +162,7 @@ class DynamicJssEnv(JssEnv):
         This will follow the S/RPT + SPT dispatching rule to obtain the action
 
         """
+
         if action_type_args.value == action_type.FIFO.value:
             action_mask = self.legal_actions
             legal_actions = [i for i, m in enumerate(action_mask) if m == 1]
@@ -229,39 +235,71 @@ class DynamicJssEnv(JssEnv):
             else:
                 assert False, "Error"
 
-    def step(self, action_type_args: str):
+    def step(self, action: int, **kwargs): #kwargs used to overwrite the action
         # With 10% probability, generate a new job.
         # if random.random() < 1: #make it generate new job for everystep
+        
+        truncated = None #this required for the gym environment
+
         if (len(self.instance_matrix) < self.max_jobs): 
             for i in range(10):
                 new_job = self.generate_new_job()
+                self._get_current_state_representation() #this is to update the current state representation to accomodate new job arrivals
+                #for every new job that comes, we have to update the state
+
                 #if self.job_arrival_times[new_job] <= self.current_time_step: #DEBUG, not sure what this does
                     #self.legal_actions[new_job] = 1 #DEBUG, not sure what this does
-                if (len(self.instance_matrix) >= self.max_jobs): #DEBUG, not
+                if (len(self.instance_matrix) >= self.max_jobs): 
                     break
+
+        #handle the nope action first since it is not in the state
+        if __name__ != "__main__": #if agent make decision
+        #check if it is illegal action
+            if self.state[:, 0][action] == 0: #DEBUG, need to handle NOPE action
+                reward = -1
+                return (self._get_current_state_representation(),
+                        reward,
+                        self._is_done(),
+                        truncated,
+                        {}
+                )
+        else: #if dispatching rule make decision
+            action = self.get_action(action_type[action])
         
-        action = self.get_action(action_type[action_type_args]) #this is dispatching rule action mechanism
+        # if not kwargs:
+        #     action = self.get_action(action_type[action])
+        # else:
+        #     for key , value in kwargs.items():
+        #         if key == "action":
+        #             action = value
+        #             break
 
         obs, reward, done, info = super().step(action)
-        return obs, reward, done, info
+        return obs, reward, done, truncated, info
+    
+    def reset(self, seed: Optional[int] = None, options: Optional[dict] = None):
+        #note that seed is not used
+
+        obs, info = super().reset(callback = self.generate_new_job) #generate new job after resets
+        # return obs, info
+        return obs, info #info is not included, because VecEnv only returns obs 
 
 if __name__ == '__main__':
+    env = DynamicJssEnv()
     for episode in range(10):
-        print(episode)
-        env = DynamicJssEnv()
         #obs, info = env.reset(callback = env.generate_new_job) #generate new job after reset
-        obs, info = env.reset(callback = env.generate_new_job) #generate new job after reset
+        obs, info = env.reset() #generate new job after reset
         done = False
         cum_reward = 0
         while not done:
-            legal_actions = obs["action_mask"]
+            # legal_actions = obs["action_mask"]
             # p = (legal_actions / legal_actions.sum()) #legal action got problem
             # actions = np.random.choice(len(legal_actions), 1, p=(legal_actions / legal_actions.sum()) )[0] #how is it possible to take NOACTION
-            obs, rewards, done, _ = env.step("S_RPT") #this goes to the step function inside the djss_env, not the jsse_env
+            
+            obs, rewards, done, _, info = env.step("S_RPT") #this goes to the step function inside the djss_env, not the jsse_env
             cum_reward += rewards
         print(f"Cumulative reward: {cum_reward}")
 
         #loggint the number of tardy jobs 
                
 
-        del env
