@@ -97,7 +97,7 @@ S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. 
 
 ## Synchronous actor critic reinforcement learning (A2C from stable baseline 3) 
 | Configurations | Values | Remarks | 
-| ------------- | ------------- |
+| ------------- | ------------- | ------------- |
 | Agent update interval (timesteps) | 500 | 
 | Entrophy coefficient | 0.01 | To avoid being in local optima | This is used for loss calculation |
 | Discount factor | 0.99 | To consider rewards from the next state | 
