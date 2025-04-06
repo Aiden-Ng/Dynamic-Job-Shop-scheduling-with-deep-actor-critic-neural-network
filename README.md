@@ -9,14 +9,23 @@ However, I soon realized that testing and benchmarking in the dynamic environmen
 
 Once the deep MARL agent is set up, it will be applied to the dynamic JSSP environment, where benchmarking will be conducted over many episodes to compare the deep MARL approach with existing dispatching rules.
 
-## Results 
+## Dynamic Job Shope Scheduling (DJSSP) environment configuration
+------------
+The dynamic job scheduling environment is characteristed by these parameters: 
+- **Number of Machines**: `6`
+- **Maximum Allowable Jobs**: `25`
+- **Processing Time Range**: `[50, 60]`
+- **Allowable Number of Operations per Job**: `[5, 6]`
+- **Due Date Tightness (α)**: `[10, 12]`
+The variation between each variable are kept minimum to allow for a more stable result. 
+
+## Dispatching Rule
 ------------
 ### Gif (Just demonstration for each dispatching rule)
 I have implemented 3 most common dispatching rule in my dynamic JSSP environment, but only  S_RPT + SPT and MTWR will be used to benchmark against the deep multi agent reinforcement learning (MARL).
 The objective of the deep MARL would be to minimize number of tardy jobs and makespan in a batch.
 
 ### Example of each dispatching rule per EPISODE
-------------
 1. First in first out (FIFO)
 
  ![GIF not loaded](./(GITHUB)%20Graphs/result_FIFO_schedule.gif)
@@ -29,18 +38,7 @@ The objective of the deep MARL would be to minimize number of tardy jobs and mak
 
  ![GIF not loaded](./(GITHUB)%20Graphs/result_MWTR_schedule.gif)
 
-### DJSSP environment configuration
-------------
-The dynamic job scheduling environment is characteristed by these parameters: 
-- **Number of Machines**: `6`
-- **Maximum Allowable Jobs**: `25`
-- **Processing Time Range**: `[50, 60]`
-- **Allowable Number of Operations per Job**: `[5, 6]`
-- **Due Date Tightness (α)**: `[10, 12]`
-The variation between each variable are kept minimum to allow for a more stable result. 
-
 ### Number of tardy jobs
-------------
 In this table for multiple episodes, S_RPT + SPT is the best in reducing number of tardy jobs. 
 | action_type | Number of Episode | Number of tardy jobs in percentage | 
 | ------------- | ------------- | ------------- | 
@@ -51,9 +49,7 @@ In this table for multiple episodes, S_RPT + SPT is the best in reducing number 
 | S_RPT + SPT  | 3000 | 4.0% |
 | MTWR  | 3000  | 6.6% | 
 
-
 ### Makespan plotted on Kernal Density Estimation (KDE) for multiple EPISODES
-------------
 1. FIFO with 1000 episode
 
  <img src="./(GITHUB) Graphs/2025-03-13_18-17-53_FIFO_1000_makespan_kdeplot.png" width="60%" height="60%"/>
@@ -85,10 +81,11 @@ For 3000 episodes, this MTWR dominates both FIFO and S_RPT + SPT
 ### Conclusion
 S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. MTWR is chosen because it is able to reduce the makespan of the jobs. Therefore, an deep MARL trained on these two objective will be used to benchmark against these existing dispatching rule.
 
-### Implementation deep actor critic reinforcement learning for dynamic JSSP (Stable baseline 3 + OpenAI Gym)
+
+## Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)
 ------------
-To note that all our rewards are normalised to [-1,1]
 ## Reward Function design (Dense reward function)
+All the rewards are normalised to [-1,1]
 | Condition | Reward | Remarks | Goal | 
 | ------------- | ------------- | ------------- | ------------- |
 | Illegal actions | `-1` | If the agent take illegal action then we will penalise it | To teach the agent to take legal actions | 
@@ -97,6 +94,7 @@ To note that all our rewards are normalised to [-1,1]
 | Job past its due date | if late `-1/3` else `+1` | | To lower number of tardy jobs |
 
 ## Synchronous actor critic reinforcement learning (A2C from stable baseline 3) 
+link : https://stable-baselines3.readthedocs.io/en/master/modules/a2c.html
 | Configurations | Values | Remarks | 
 | ------------- | ------------- | ------------- |
 | Agent update interval (timesteps) | 500 | 
@@ -105,14 +103,19 @@ To note that all our rewards are normalised to [-1,1]
 | Value function coefficient | 0.5 | This is used for loss calculation | 
 
 ### Multi - layer perceptron configurations (MLP - policy from stable baseline 3)
+link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.html
 | Configurations | Values | Remarks | 
 | ------------- | ------------- | ------------- |
 | Neural network layers | 2 | 
 | Activation function | tanh() |
 | Learning rate | 0.007 | 
 
-### Results
+### Deep actor-critic reinforcement learning results
 
+
+
+
+## Comparing both Dispatching rule and Deep actor-critic reinforcement learning
 
 ### YET TO DO 
 1. Design reward function - in progress
