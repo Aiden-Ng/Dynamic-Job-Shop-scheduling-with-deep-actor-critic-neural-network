@@ -52,7 +52,6 @@ In this table for multiple episodes, S_RPT + SPT is the best in reducing number 
 | MTWR  | 3000  | 6.6% | 
 
 
-
 ### Makespan plotted on Kernal Density Estimation (KDE) for multiple EPISODES
 ------------
 1. FIFO with 1000 episode
@@ -85,6 +84,31 @@ For 3000 episodes, this MTWR dominates both FIFO and S_RPT + SPT
 
 ### Conclusion
 S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. MTWR is chosen because it is able to reduce the makespan of the jobs. Therefore, an deep MARL trained on these two objective will be used to benchmark against these existing dispatching rule.
+
+### Implementation deep actor critic reinforcement learning for dynamic JSSP (Stable baseline 3 + OpenAI Gym)
+------------
+## Reward Function design (Dense reward function)
+| Condition | Reward | Remarks | Goal | 
+| ------------- | ------------- | ------------- | ------------- |
+| Illegal actions | -1 | If the agent take illegal action then we will penalise it | To teach the agent to take legal actions | 
+| Processed Jobs | + 1 * time_processed | For every unit of time that the job is processed, the agent receives a reward equivalent to the amount of processed time | To encourage agent to keep selecting jobs | 
+| Machine idle time | - 1 * time_idle | For every unit time of machine being idle, the agent will be penalized | To minimize makespan | 
+| Job past its due date | if late -1/3 else +1 | To lower number of tardy jobs |
+
+## Synchronous actor critic reinforcement learning (A2C from stable baseline 3) 
+| Configurations | Values | Remarks | 
+| ------------- | ------------- |
+| Agent update interval (timesteps) | 500 | 
+| Entrophy coefficient | 0.01 | To avoid being in local optima | This is used for loss calculation |
+| Discount factor | 0.99 | To consider rewards from the next state | 
+| Value function coefficient | 0.5 | This is used for loss calculation | 
+
+### Multi - layer perceptron configurations (MLP - policy from stable baseline 3)
+| Configurations | Values | Remarks | 
+| Neural network layers | 2 | |
+
+### Results
+
 
 ### YET TO DO 
 1. Design reward function - in progress
