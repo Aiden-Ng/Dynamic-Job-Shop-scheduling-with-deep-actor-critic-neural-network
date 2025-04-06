@@ -94,7 +94,7 @@ To note that all our rewards are normalised to [-1,1]
 | Illegal actions | `-1` | If the agent take illegal action then we will penalise it | To teach the agent to take legal actions | 
 | Processed Jobs | `+ 1 * time_processed` | For every unit of time that the job is processed, the agent receives a reward equivalent to the amount of processed time | To encourage agent to keep selecting jobs | 
 | Machine idle time | `- 1 * time_idle` | For every unit time of machine being idle, the agent will be penalized | To minimize makespan | 
-| Job past its due date | if late `-1/3` else `+1` | To lower number of tardy jobs |
+| Job past its due date | if late `-1/3` else `+1` | | To lower number of tardy jobs |
 
 ## Synchronous actor critic reinforcement learning (A2C from stable baseline 3) 
 | Configurations | Values | Remarks | 
