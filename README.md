@@ -106,6 +106,7 @@ To note that all our rewards are normalised to [-1,1]
 
 ### Multi - layer perceptron configurations (MLP - policy from stable baseline 3)
 | Configurations | Values | Remarks | 
+| ------------- | ------------- | ------------- |
 | Neural network layers | 2 | 
 | Activation function | tanh() |
 | Learning rate | 0.007 | 
