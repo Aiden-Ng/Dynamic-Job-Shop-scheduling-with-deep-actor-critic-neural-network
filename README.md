@@ -87,13 +87,14 @@ S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. 
 
 ### Implementation deep actor critic reinforcement learning for dynamic JSSP (Stable baseline 3 + OpenAI Gym)
 ------------
+To note that all our rewards are normalised to [-1,1]
 ## Reward Function design (Dense reward function)
 | Condition | Reward | Remarks | Goal | 
 | ------------- | ------------- | ------------- | ------------- |
-| Illegal actions | -1 | If the agent take illegal action then we will penalise it | To teach the agent to take legal actions | 
-| Processed Jobs | + 1 * time_processed | For every unit of time that the job is processed, the agent receives a reward equivalent to the amount of processed time | To encourage agent to keep selecting jobs | 
-| Machine idle time | - 1 * time_idle | For every unit time of machine being idle, the agent will be penalized | To minimize makespan | 
-| Job past its due date | if late -1/3 else +1 | To lower number of tardy jobs |
+| Illegal actions | `-1` | If the agent take illegal action then we will penalise it | To teach the agent to take legal actions | 
+| Processed Jobs | `+ 1 * time_processed` | For every unit of time that the job is processed, the agent receives a reward equivalent to the amount of processed time | To encourage agent to keep selecting jobs | 
+| Machine idle time | `- 1 * time_idle` | For every unit time of machine being idle, the agent will be penalized | To minimize makespan | 
+| Job past its due date | if late `-1/3` else `+1` | To lower number of tardy jobs |
 
 ## Synchronous actor critic reinforcement learning (A2C from stable baseline 3) 
 | Configurations | Values | Remarks | 
@@ -106,6 +107,8 @@ S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. 
 ### Multi - layer perceptron configurations (MLP - policy from stable baseline 3)
 | Configurations | Values | Remarks | 
 | Neural network layers | 2 | 
+| Activation function | tanh() |
+| Learning rate | 0.007 | 
 
 ### Results
 
