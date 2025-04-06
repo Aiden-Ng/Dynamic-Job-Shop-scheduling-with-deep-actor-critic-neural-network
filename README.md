@@ -105,7 +105,7 @@ S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. 
 
 ### Multi - layer perceptron configurations (MLP - policy from stable baseline 3)
 | Configurations | Values | Remarks | 
-| Neural network layers | 2 | |
+| Neural network layers | 2 | 
 
 ### Results
 
