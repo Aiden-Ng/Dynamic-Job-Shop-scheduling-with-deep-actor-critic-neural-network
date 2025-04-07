@@ -42,7 +42,7 @@ class Debug():
 
         #debug for file reading
         self.row = 0
-        self.job_file = (Path(__file__).parent / ".." / ".." / "(DEBUG)" / "dj1").resolve()
+        self.job_file = (Path(__file__).parent / ".." / ".." / "Project" / "(DEBUG)" / "dj1.txt").resolve()
 
 class DynamicJssEnv(JssEnv):
     def __init__(self, env_config=None, render_mode=None):
@@ -241,21 +241,23 @@ class DynamicJssEnv(JssEnv):
         
         truncated = None #this required for the gym environment
 
-        if (len(self.instance_matrix) < self.max_jobs): 
-            for i in range(10):
-                new_job = self.generate_new_job()
-                self._get_current_state_representation() #this is to update the current state representation to accomodate new job arrivals
-                #for every new job that comes, we have to update the state
+        # how to set a probability of <0.4, make this such that new job arrival would not come in certain timestep
+        if random.random() < 0.2:
+            if (len(self.instance_matrix) < self.max_jobs): 
+                for i in range(10):
+                    new_job = self.generate_new_job()
+                    self._get_current_state_representation() #this is to update the current state representation to accomodate new job arrivals
+                    #for every new job that comes, we have to update the state
 
-                #if self.job_arrival_times[new_job] <= self.current_time_step: #DEBUG, not sure what this does
-                    #self.legal_actions[new_job] = 1 #DEBUG, not sure what this does
-                if (len(self.instance_matrix) >= self.max_jobs): 
-                    break
+                    #if self.job_arrival_times[new_job] <= self.current_time_step: #DEBUG, not sure what this does
+                        #self.legal_actions[new_job] = 1 #DEBUG, not sure what this does
+                    if (len(self.instance_matrix) >= self.max_jobs): 
+                        break
 
         #handle the nope action first since it is not in the state
         if __name__ != "__main__": #if agent make decision
         #check if it is illegal action
-            if self.state[:, 0][action] == 0: #DEBUG, need to handle NOPE action
+            if self.state[:, 0][action] != 1 : #DEBUG, need to handle NOPE action
                 reward = -1
                 return (self._get_current_state_representation(),
                         reward,
@@ -279,8 +281,9 @@ class DynamicJssEnv(JssEnv):
     
     def reset(self, seed: Optional[int] = None, options: Optional[dict] = None):
         #note that seed is not used
-
-        obs, info = super().reset(callback = self.generate_new_job) #generate new job after resets
+        
+        obs, info = super().reset(callback=self.generate_new_job, env_config=options)  # generate new job after resets
+        
         # return obs, info
         return obs, info #info is not included, because VecEnv only returns obs 
 

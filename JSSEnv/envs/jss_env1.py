@@ -85,9 +85,11 @@ class JssEnv(gym.Env):
         self.max_proc_time = 60 #maximum processing time
         self.operation_num_min = 8 #minimum number of operations for each jobs
         self.operation_num_max = 9 #maximum number of operations for each jobs
-        self.max_jobs = 25 #set the max number of jobs allowable
+        self.max_jobs = None #set the max number of jobs allowable
         #self.jobs is already initialized above
         
+        # this is the state manager that manages the state 
+        self.max_jobs_feature = 100
         #changed by dyanmic scheduling
         self.instance_matrix = []
         self.jobs_length = []
@@ -112,7 +114,7 @@ class JssEnv(gym.Env):
         assert self.machines > 1, "We need at least 2 machines"
         # assert self.instance_matrix is not None
         # allocate a job + one to wait
-        self.action_space = gym.spaces.Discrete(self.max_jobs + 1) #size of the action space must be constant, and +1 refers to NOPE action
+        self.action_space = gym.spaces.Discrete(self.max_jobs_feature + 1) #size of the action space must be constant, and +1 refers to NOPE action
         
         # used for plotting
         self.colors = [
@@ -129,7 +131,7 @@ class JssEnv(gym.Env):
             -Total IDLE time in the schedule
         """
 
-        self.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=(self.max_jobs + 1, 8), dtype=float) #note that the 8th one is the legal_action mask, +1 is for the NOPE action
+        self.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=(self.max_jobs_feature + 1, 8), dtype=float) #note that the 8th one is the legal_action mask, +1 is for the NOPE action
         # self.observation_space = gym.spaces.Dict(
         #     {
         #         "action_mask": gym.spaces.Box(0, 1, shape=(self.jobs + 1,)),
@@ -142,17 +144,26 @@ class JssEnv(gym.Env):
     def _get_current_state_representation(self):
         
         #for legal_actions
-        padded_legal_actions = np.pad(self.legal_actions, (0, (self.max_jobs + 1) - (self.legal_actions.shape[0])), mode='constant', constant_values=0) #padding for self.legal_actions
+        padded_legal_actions = np.pad(self.legal_actions, (0, (self.max_jobs_feature + 1) - (self.legal_actions.shape[0])), mode='constant', constant_values=0) #padding for self.legal_actions
         self.state[:, 0] = padded_legal_actions #reshape to 2D array
 
-        #for allowance
-        # padded_allowance_jobs = np.pad(self.allowance_jobs, (0, (self.max_jobs + 1) - (self.allowance_jobs.shape[0])), mode='constant', constant_values=0) #padding for self.allowance_jobs
-        # self.allowance_jobs_feature = padded_allowance_jobs #bit OR
-        # self.state[:, 7] = self.allowance_jobs_feature #reshape to 2D array
+        #feature 1 
+        # self.state[:, 1] = np.pad(self.state[:, 1], (0, (self.max_jobs_feature + 1) - (self.state[:, 1].shape[0])), mode='constant', constant_values=-1) #padding for self.state[:, 1]
+        # #feature 2
+        # self.state[:, 2] = np.pad(self.state[:, 2], (0, (self.max_jobs_feature + 1) - (self.state[:, 2].shape[0])), mode='constant', constant_values=-1) #padding for self.state[:, 2]
+        # #feature 3
+        # self.state[:, 3] = np.pad(self.state[:, 3], (0, (self.max_jobs_feature + 1) - (self.state[:, 3].shape[0])), mode='constant', constant_values=-1)
+        # #feature 4
+        # self.state[:, 4] = np.pad(self.state[:, 4], (0, (self.max_jobs_feature + 1) - (self.state[:, 4].shape[0])), mode='constant', constant_values=-1)
+        # #feature 5
+        # self.state[:, 5] = np.pad(self.state[:, 5], (0, (self.max_jobs_feature + 1) - (self.state[:, 5].shape[0])), mode='constant', constant_values=-1)
+        # #feature 6
+        # self.state[:, 6] = np.pad(self.state[:, 6], (0, (self.max_jobs_feature + 1) - (self.state[:, 6].shape[0])), mode='constant', constant_values=-1)
         
         # this is such that the range is [-1,1], but if the processed time is way big it will exceedl [-1,1]
-        padded_allowance_over_slack = np.pad(self.allowance_over_slack , (0,(self.max_jobs + 1) - (self.allowance_over_slack.shape[0])), mode='constant', constant_values=0) #padding for self.allowance_over_slack
+        padded_allowance_over_slack = np.pad(self.allowance_over_slack , (0,(self.max_jobs_feature + 1) - (self.allowance_over_slack.shape[0])), mode='constant', constant_values=0) #padding for self.allowance_over_slack
         self.state[:, 7] = padded_allowance_over_slack 
+        
 
         # self.state[:, 0] = self.legal_actions[:-1]
         return self.state
@@ -163,10 +174,21 @@ class JssEnv(gym.Env):
     def get_legal_actions(self):
         return self.legal_actions
 
-    def reset(self, callback):
+    def reset(self, callback, env_config = None):
+        
+        #DEBUG
         self.reset_count += 1 #increment the reset count
 
-        #additional variables
+        if env_config is not None: 
+            for key, value in env_config.items():
+                if key == "max_jobs":
+                    if value is not None:
+                        self.max_jobs = value #set the max number of jobs allowable
+                    
+        if self.max_jobs is None:
+            self.max_jobs = random.randint(30,50) #set the max number of jobs allowable
+
+        
         self.jobs = 0 #reset the number of jobs
         self.due_date_jobs = np.zeros(self.jobs, dtype=int) 
         self.allowance_jobs = np.zeros(self.jobs, dtype=int) 
@@ -204,7 +226,7 @@ class JssEnv(gym.Env):
         self.action_illegal_no_op = np.zeros(self.jobs, dtype=bool)
         self.machine_legal = np.zeros(self.machines, dtype=bool) #NOT DYNAMIC #different from jss_env.py
         #this is to get the machine for the first operation
-        self.state = np.zeros((self.max_jobs + 1, 8), dtype=float) #6 featurea nd the legal_action, +1 for the NOPE action
+        self.state = np.zeros((self.max_jobs_feature + 1, 8), dtype=float) #6 featurea nd the legal_action, +1 for the NOPE action
 
         # at least one job for the beginning of the episode
         if callback:
@@ -543,11 +565,11 @@ class JssEnv(gym.Env):
         remaining_processing_time = (self.jobs_length - self.total_perform_op_time_jobs)
         self.slack_jobs =  self.allowance_jobs - remaining_processing_time
 
-        self.allowance_over_slack = np.where(self.allowance_jobs != 0,
+        self.allowance_over_slack = np.where(self.allowance_jobs > remaining_processing_time,
                       self.slack_jobs / self.allowance_jobs,
-                      np.nan)
+                      -1) #this is to avoid division by 0 when allowance 
         #check for invalud action
-        assert np.all(np.isfinite(self.state[:8])), "State contains invalid (non-finite) values!" 
+        # assert np.all(np.isfinite(self.state[:8])), "State contains invalid (non-finite) values!" 
 
         #update the makespan
         self.makespan = max(self.makespan, max(self.total_perform_op_time_jobs + self.total_idle_time_jobs))
