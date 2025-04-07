@@ -114,7 +114,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 ## Comparing both Dispatching rule and Deep actor-critic reinforcement learning
 **1000 Episodes**
 
-| action_type | maximum allowable jobs | Number of tardy jobs in percentage | 
+| action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
 | ------------- | ------------- | ------------- | 
 | FIFO | 25 | 42.9% |
 | S_RPT + SPT | 25 | 57.4% |
@@ -135,7 +135,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 
 **3000 Episodes**
 
-| action_type | maximum allowable jobs | Number of tardy jobs in percentage | 
+| action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
 | ------------- | ------------- | ------------- | 
 | FIFO | 25 | |
 | S_RPT + SPT | 25 | |
@@ -156,7 +156,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 
 **5000 Episodes**
 
-| action_type | maximum allowable jobs | Number of tardy jobs in percentage | 
+| action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
 | ------------- | ------------- | ------------- | 
 | FIFO | 25 | |
 | S_RPT + SPT | 25 | |
