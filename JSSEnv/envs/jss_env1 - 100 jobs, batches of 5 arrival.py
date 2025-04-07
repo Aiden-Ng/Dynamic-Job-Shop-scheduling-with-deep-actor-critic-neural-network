@@ -1,0 +1,616 @@
+import bisect
+import datetime
+import random
+
+import pandas as pd
+# import gymnasium as gym
+import gym
+import numpy as np
+import plotly.figure_factory as ff
+from pathlib import Path
+
+"""
+
+Version : 1.01
+Date: 1/3/2025
+
+Note:
+1. Changed the observation space and the action space
+
+Future Works:
+1. Refer to djss_env.py
+"""
+
+class JssEnv(gym.Env):
+    def __init__(self, env_config=None, render_mode = None):
+        """
+        This environment model the job shop scheduling problem as a single agent problem:
+
+        -The actions correspond to a job allocation + one action for no allocation at this time step (NOPE action)
+
+        -We keep a time with next possible time steps
+
+        -Each time we allocate a job, the end of the job is added to the stack of time steps
+
+        -If we don't have a legal action (i.e. we can't allocate a job),
+        we automatically go to the next time step until we have a legal action
+
+        -
+        :param env_config: Ray dictionary of config parameter
+        """
+        if env_config is None:
+            env_config = {
+                "instance_path": Path(__file__).parent.absolute() / "instances" / "ta01",
+            }
+        instance_path = env_config["instance_path"]
+        # custom additional self declared var
+        self.render_mode = render_mode
+
+        # initial values for variables used for instance
+        self.jobs = 0
+        self.machines = 0
+        self.instance_matrix = None
+        self.jobs_length = None
+        self.max_time_op = 0
+        self.max_time_jobs = 0
+        self.nb_legal_actions = 0
+        self.nb_machine_legal = 0
+        # initial values for variables used for solving (to reinitialize when reset() is called)
+        self.solution = None
+        self.last_solution = None
+        self.last_time_step = float("inf")
+        self.current_time_step = float("inf")
+        self.next_time_step = list()
+        self.next_jobs = list()
+        self.legal_actions = None
+        self.allowance_jobs_feature = None
+        self.time_until_available_machine = None
+        self.time_until_finish_current_op_jobs = None
+        self.todo_time_step_job = None
+        self.total_perform_op_time_jobs = None
+        self.needed_machine_jobs = None
+        self.total_idle_time_jobs = None
+        self.idle_time_jobs_last_op = None
+        self.state = None
+        self.illegal_actions = None
+        self.action_illegal_no_op = None
+        self.machine_legal = None
+        # initial values for variables used for representation
+        self.start_timestamp = datetime.datetime.now().timestamp()
+        self.sum_op = 0
+        
+        #load the instance
+        self.machines = 6
+        self.min_proc_time = 50 #minimum processing time
+        self.max_proc_time = 60 #maximum processing time
+        self.operation_num_min = 8 #minimum number of operations for each jobs
+        self.operation_num_max = 9 #maximum number of operations for each jobs
+        self.max_jobs = 25 #set the max number of jobs allowable
+        #self.jobs is already initialized above
+        
+        #changed by dyanmic scheduling
+        self.instance_matrix = []
+        self.jobs_length = []
+        self.jobs_completed = []
+
+        #initialize the variable required for action selection S/RPT + SPT dispatching rule
+        self.due_date_jobs = [] #must be dynamic
+        self.allowance_jobs = []
+        self.flow_time = []
+        self.slack_jobs = []
+        
+        self.makespan = 0 #this is a singular value
+        self.allowance_over_slack = None
+
+        #DEBUG, for debugging purposes
+        self.reset_count = 0
+
+        # check the parsed data are correct
+        # assert self.max_time_op > 0
+        # assert self.max_time_jobs > 0
+        # assert self.jobs > 0
+        assert self.machines > 1, "We need at least 2 machines"
+        # assert self.instance_matrix is not None
+        # allocate a job + one to wait
+        self.action_space = gym.spaces.Discrete(self.max_jobs + 1) #size of the action space must be constant, and +1 refers to NOPE action
+        
+        # used for plotting
+        self.colors = [
+            tuple([random.random() for _ in range(3)]) for _ in range(self.machines)
+        ]
+        """
+        matrix with the following attributes for each job:
+            -Legal job
+            -Left over time on the current op
+            -Current operation %
+            -Total left over time
+            -When next machine available
+            -Time since IDLE: 0 if not available, time otherwise
+            -Total IDLE time in the schedule
+        """
+
+        self.observation_space = gym.spaces.Box(low=0.0, high=1.0, shape=(self.max_jobs + 1, 8), dtype=float) #note that the 8th one is the legal_action mask, +1 is for the NOPE action
+        # self.observation_space = gym.spaces.Dict(
+        #     {
+        #         "action_mask": gym.spaces.Box(0, 1, shape=(self.jobs + 1,)),
+        #         "real_obs": gym.spaces.Box(
+        #             low=0.0, high=1.0, shape=(self.jobs, 7), dtype=float
+        #         ),
+        #     }
+        
+
+    def _get_current_state_representation(self):
+        
+        #for legal_actions
+        padded_legal_actions = np.pad(self.legal_actions, (0, (self.max_jobs + 1) - (self.legal_actions.shape[0])), mode='constant', constant_values=0) #padding for self.legal_actions
+        self.state[:, 0] = padded_legal_actions #reshape to 2D array
+
+        #for allowance
+        # padded_allowance_jobs = np.pad(self.allowance_jobs, (0, (self.max_jobs + 1) - (self.allowance_jobs.shape[0])), mode='constant', constant_values=0) #padding for self.allowance_jobs
+        # self.allowance_jobs_feature = padded_allowance_jobs #bit OR
+        # self.state[:, 7] = self.allowance_jobs_feature #reshape to 2D array
+        
+        # this is such that the range is [-1,1], but if the processed time is way big it will exceedl [-1,1]
+        padded_allowance_over_slack = np.pad(self.allowance_over_slack , (0,(self.max_jobs + 1) - (self.allowance_over_slack.shape[0])), mode='constant', constant_values=0) #padding for self.allowance_over_slack
+        self.state[:, 7] = padded_allowance_over_slack 
+
+        # self.state[:, 0] = self.legal_actions[:-1]
+        return self.state
+            # "real_obs": self.state,
+            # "action_mask": self.legal_actions,
+        
+
+    def get_legal_actions(self):
+        return self.legal_actions
+
+    def reset(self, callback):
+        self.reset_count += 1 #increment the reset count
+
+        #additional variables
+        self.jobs = 0 #reset the number of jobs
+        self.due_date_jobs = np.zeros(self.jobs, dtype=int) 
+        self.allowance_jobs = np.zeros(self.jobs, dtype=int) 
+        self.flow_time = np.zeros(self.jobs, dtype=int)
+        self.slack_jobs = np.zeros(self.jobs, dtype=int) 
+        self.time_taken_to_proc_all_jobs = np.zeros(self.jobs, dtype=int) 
+        self.makespan = 0 #reset the makespan   
+        self.instance_matrix = [] #reset the instance matrix
+        self.jobs_length = []
+        self.jobs_completed = np.zeros(self.jobs, dtype=int) #to keep track of which job is finished process for the reward
+
+        #original start here
+        self.current_time_step = 0
+        self.next_time_step = list()
+        self.next_jobs = list()
+        self.nb_legal_actions = self.jobs
+        self.nb_machine_legal = self.machines #different from jss_env.py
+        # represent all the legal actions
+        self.legal_actions = np.ones(self.jobs + 1, dtype=np.int8)
+        self.legal_actions[self.jobs] = False #disable this because first time step no job
+
+        self.allowance_over_slack = np.array([])
+
+        # used to represent the solution
+        self.solution = [] #DYNAMIC
+        self.time_until_available_machine = np.zeros(self.machines, dtype=int) #NOT DYNAMIC
+        self.time_until_finish_current_op_jobs = np.zeros(self.jobs, dtype=int)
+        self.todo_time_step_job = np.zeros(self.jobs, dtype=int) 
+        self.total_perform_op_time_jobs = np.zeros(self.jobs, dtype=int)
+        self.needed_machine_jobs = np.zeros(self.jobs, dtype=int)
+        self.total_idle_time_jobs = np.zeros(self.jobs, dtype=int)
+        self.idle_time_jobs_last_op = np.zeros(self.jobs, dtype=int)
+        self.illegal_actions = np.zeros((self.machines, self.jobs), dtype=bool) #NOT DYNAMIC for self.machines, but dynamic for self.jobs
+
+        self.action_illegal_no_op = np.zeros(self.jobs, dtype=bool)
+        self.machine_legal = np.zeros(self.machines, dtype=bool) #NOT DYNAMIC #different from jss_env.py
+        #this is to get the machine for the first operation
+        self.state = np.zeros((self.max_jobs + 1, 8), dtype=float) #6 featurea nd the legal_action, +1 for the NOPE action
+
+        # at least one job for the beginning of the episode
+        if callback:
+            callback() #this callback is meant to generate new jobs and append new jobs to the instance_matrix
+        else : 
+            assert False, "Callback is not defined"
+
+        #for debugging purposes
+        self.step_count = 0
+        self.prev_action = None
+        self.last_next_time_step = None
+        self.action_last_next_time_step = None
+        self.increase_time_step_count = 0
+
+        info = {} #
+        temp = self._get_current_state_representation()
+        return temp, info
+
+    def _prioritization_non_final(self):
+        #not sure what does this section does
+        if self.nb_machine_legal >= 1:
+            for machine in range(self.machines): #NOT DYNAMIC
+                if self.machine_legal[machine]:
+                    final_job = list()
+                    non_final_job = list()
+                    min_non_final = float("inf")
+                    for job in range(self.jobs):
+                        if (
+                            self.needed_machine_jobs[job] == machine
+                            and self.legal_actions[job]
+                        ):
+                            if self.todo_time_step_job[job] == (len(self.instance_matrix[job]) - 1): #DYANMIC
+                                final_job.append(job)
+                            else:
+                                current_time_step_non_final = self.todo_time_step_job[
+                                    job
+                                ]
+                                time_needed_legal = self.instance_matrix[job][
+                                    current_time_step_non_final
+                                ][1]
+                                machine_needed_nextstep = self.instance_matrix[job][
+                                    current_time_step_non_final + 1
+                                ][0]
+                                if (
+                                    self.time_until_available_machine[
+                                        machine_needed_nextstep
+                                    ]
+                                    == 0
+                                ):
+                                    min_non_final = min(
+                                        min_non_final, time_needed_legal
+                                    )
+                                    non_final_job.append(job)
+                    if len(non_final_job) > 0:
+                        for job in final_job:
+                            current_time_step_final = self.todo_time_step_job[job]
+                            time_needed_legal = self.instance_matrix[job][
+                                current_time_step_final
+                            ][1]
+                            if time_needed_legal > min_non_final:
+                                self.legal_actions[job] = False
+                                self.nb_legal_actions -= 1
+
+    def _check_no_op(self):
+        self.legal_actions[self.jobs] = False
+        if (
+            len(self.next_time_step) > 0 #this got problem
+            #and self.nb_machine_legal <= 2 #this will keep causing nan probability
+            # and self.nb_legal_actions <= 2
+        ):
+            #initialization of the values
+            machine_next = set()
+            next_time_step = self.next_time_step[0]
+            max_horizon = self.current_time_step #this is not being updated
+            max_horizon_machine = [
+                self.current_time_step + self.max_time_op for _ in range(self.machines) #NOT DYNAMIC
+            ]
+            
+            for job in range(self.jobs):
+                if self.legal_actions[job]: #consider only jobs that can be scheduled
+                    time_step = self.todo_time_step_job[job]
+                    machine_needed = self.instance_matrix[job][time_step][0]
+                    time_needed = self.instance_matrix[job][time_step][1]
+                    end_job = self.current_time_step + time_needed
+                    if end_job < next_time_step:
+                        return
+                    max_horizon_machine[machine_needed] = min(
+                        max_horizon_machine[machine_needed], end_job
+                    )
+                    max_horizon = max(max_horizon, max_horizon_machine[machine_needed])
+
+            for job in range(self.jobs):
+                if not self.legal_actions[job]: #consider only jobs that cannot be scheduled
+                    #self.time_until_finish_current_op_jobs[job] > 0 means that the job is currently being processed
+                    #self.todo_time_step_job[job] + 1 < self.machines means that the job is not the last operation
+                    if (self.time_until_finish_current_op_jobs[job] > 0 and self.todo_time_step_job[job] + 1 < len(self.instance_matrix[job])):
+                        time_step = self.todo_time_step_job[job] + 1
+                        time_needed = (
+                            self.current_time_step
+                            + self.time_until_finish_current_op_jobs[job]
+                        )
+                        # time_step < self.machines, ensuring that the job has at least one step left
+                        # max_horizon > time_needed, ensuring that the job can be completed before the latest job completion time
+                        while (time_step < len(self.instance_matrix[job]) - 1 and max_horizon > time_needed):
+                            machine_needed = self.instance_matrix[job][time_step][0]
+                            if (
+                                max_horizon_machine[machine_needed] > time_needed #check if the machine is available
+                                and self.machine_legal[machine_needed] #check if this machine is ready for scheduling
+                            ):
+                                machine_next.add(machine_needed)
+                                if len(machine_next) == self.nb_machine_legal: #issue
+                                    self.legal_actions[self.jobs] = True
+                                    return
+                            time_needed += self.instance_matrix[job][time_step][1]
+                            time_step += 1
+                    # if the job is the last operation, then it will come in here
+                    elif (not self.action_illegal_no_op[job] and self.todo_time_step_job[job] < len(self.instance_matrix[job])):
+                        time_step = self.todo_time_step_job[job]
+                        machine_needed = self.instance_matrix[job][time_step][0]
+                        time_needed = (
+                            self.current_time_step
+                            + self.time_until_available_machine[machine_needed]
+                        )
+                        # this is problematic for dynamic first scheduling cuz max_horizon cant be updated
+                        # not sure what is this really doing
+                        while (time_step < len(self.instance_matrix[job]) - 1 and max_horizon > time_needed):
+                            machine_needed = self.instance_matrix[job][time_step][0]
+                            if (
+                                max_horizon_machine[machine_needed] > time_needed
+                                and self.machine_legal[machine_needed]
+                            ):
+                                machine_next.add(machine_needed)
+                                if len(machine_next) == self.nb_machine_legal:
+                                    self.legal_actions[self.jobs] = True
+                                    return
+                            time_needed += self.instance_matrix[job][time_step][1]
+                            time_step += 1
+
+            #(self.nb_legal_actions) this case is for when the machine is running, 
+            #but when the machine is done, 
+            if (self.nb_legal_actions == 0): 
+                self.legal_actions[self.jobs] = True #because this occur for the earlier round where the machine has no_legal_actions due to the absence of schedulable_jobs
+            
+
+    def step(self, action: int):
+        #increment debug_action_count
+        self.step_count += 1 #DEBUG
+        reward = 0.0
+        reward_allowance = 0.0 #used to check if the job is late or not, because i do not want this to be scaled
+        
+        #this handles the NOPE (no operation when the agent chooses not to schedule a job)
+        if action == self.jobs: # why this 0 cannot be?
+            self.nb_machine_legal = 0
+            self.nb_legal_actions = 0
+            #not what this section does
+            for job in range(self.jobs): 
+                if self.legal_actions[job]:
+                    self.legal_actions[job] = False
+                    needed_machine = self.needed_machine_jobs[job]
+                    self.machine_legal[needed_machine] = False
+                    self.illegal_actions[needed_machine][job] = True
+                    self.action_illegal_no_op[job] = True
+            self.action_last_next_time_step = self.next_time_step #DEBUG
+            while self.nb_machine_legal == 0 and len(self.next_time_step) > 0: #DEBUG, not sure different from jss_env.py
+                temp_reward, temp_reward_allowance = self.increase_time_step()
+                reward += temp_reward
+                reward_allowance += temp_reward_allowance #this is for late jobs
+
+            self.increase_time_step_count = 0
+            scaled_reward = self._reward_scaler(reward) + reward_allowance
+            self._prioritization_non_final()
+            self._check_no_op()
+            self.prev_action = action #DEBUG
+            return (
+                self._get_current_state_representation(),
+                scaled_reward,
+                self._is_done(),
+                {},
+            )
+        else:
+            current_time_step_job = self.todo_time_step_job[action] 
+            machine_needed = self.needed_machine_jobs[action]
+            time_needed = self.instance_matrix[action][current_time_step_job][1] #get the time needed for that job
+            reward += time_needed
+            self.time_until_available_machine[machine_needed] = time_needed #time until the machine is available
+            self.time_until_finish_current_op_jobs[action] = time_needed #time until the job is finished
+            self.state[action][1] = time_needed / self.max_time_op #normalization of jobs
+            to_add_time_step = self.current_time_step + time_needed #calculating when will the current job end
+            if to_add_time_step not in self.next_time_step:
+                index = bisect.bisect_left(self.next_time_step, to_add_time_step) # getting the index on where to_add_time_step should be
+                self.next_time_step.insert(index, to_add_time_step)
+                self.next_jobs.insert(index, action) # not sure what this does
+            self.solution[action][current_time_step_job] = self.current_time_step
+            for job in range(self.jobs):
+                if (self.needed_machine_jobs[job] == machine_needed and self.legal_actions[job]):
+                    self.legal_actions[job] = False #mark jobs that require that machine as false
+                    self.nb_legal_actions -= 1
+            self.nb_machine_legal -= 1 
+            self.machine_legal[machine_needed] = False #if machine occupied, then change the machine_legal to false
+            
+            #resets illegal actions for the machine
+            for job in range(self.jobs):
+                if self.illegal_actions[machine_needed][job]:
+                    self.action_illegal_no_op[job] = False
+                    self.illegal_actions[machine_needed][job] = False
+            # if we can't allocate new job in the current timestep, we pass to the next one
+            self.last_next_time_step = self.next_time_step #DEBUG
+            while self.nb_machine_legal == 0 and len(self.next_time_step) > 0: #NOT SURE, seems like it will stuck here if no job avail
+                temp_reward, temp_reward_allowance = self.increase_time_step()
+                reward += temp_reward
+                reward_allowance += temp_reward_allowance #this is for late jobs
+
+            self.increase_time_step_count = 0 #DEBUG
+            self._prioritization_non_final() #prioritize non final jobs over final jobs
+            self._check_no_op() #check if we can take no operation as step
+            # we then need to scale the reward
+            scaled_reward = self._reward_scaler(reward) + reward_allowance
+            self.prev_action = action #DEBUG
+            return (
+                self._get_current_state_representation(),
+                scaled_reward,
+                self._is_done(),
+                {},
+            )
+
+    def _reward_scaler(self, reward):
+        #DEBUG, 
+        return reward / self.max_time_op 
+
+    def increase_time_step(self):
+        """
+        The heart of the logic his here, we need to increase every counter when we have a nope action called
+        and return the time elapsed
+        :return: time elapsed
+        """
+        reward_allowance = 0 #DEBUG
+        self.increase_time_step_count +=1 #DEBUG
+
+        hole_planning = 0
+        next_time_step_to_pick = self.next_time_step.pop(0)
+        self.next_time_step_to_pick = next_time_step_to_pick #DEBUG
+        self.next_jobs.pop(0)
+        difference = next_time_step_to_pick - self.current_time_step
+        self.current_time_step = next_time_step_to_pick
+        for job in range(self.jobs):
+            was_left_time = self.time_until_finish_current_op_jobs[job] #get the time left for the specific job to finish
+            if was_left_time > 0:
+                performed_op_job = min(difference, was_left_time)
+                #maths for updating the time left for the job to finish
+                self.time_until_finish_current_op_jobs[job] = max(
+                    0, self.time_until_finish_current_op_jobs[job] - difference
+                )
+                # not sure what state is this?
+                self.state[job][1] = (
+                    self.time_until_finish_current_op_jobs[job] / self.max_time_op
+                )
+                #percentage of the job completed
+                self.total_perform_op_time_jobs[job] += performed_op_job
+                self.state[job][3] = (
+                    self.total_perform_op_time_jobs[job] / self.max_time_jobs
+                )
+
+
+                if self.time_until_finish_current_op_jobs[job] == 0:
+                    self.total_idle_time_jobs[job] += difference - was_left_time
+                    self.state[job][6] = self.total_idle_time_jobs[job] / self.sum_op
+                    self.idle_time_jobs_last_op[job] = difference - was_left_time
+                    self.state[job][5] = self.idle_time_jobs_last_op[job] / self.sum_op
+                    self.todo_time_step_job[job] += 1 #this is where the job is decides if the operation is done
+
+                    # checks if the job is done and if it was never completed before
+                    if self.todo_time_step_job[job] == len(self.instance_matrix[job]):
+                        if self.jobs_completed[job] == 0: #if the job was not completed
+                            self.jobs_completed[job] = 1 #toggle the job to complete                            
+                            # scale_factor = 50 #hardcoded value
+                            # hole_planning -= 50 * np.tanh(self.allowance_jobs[job] / scale_factor) #explanation below
+                            # hole_planning -= self.allowance_jobs[job]
+                            #the reason why -= is because the output of this increase_time_step will be negative from reward -= increase_time_step()
+                            #therefore, if the job is early, the allowance would be +ve and - - = + 
+                            if self.slack_jobs[job] > 0: #if the job is tardy
+                                reward_allowance += 0.5
+                            else :
+                                reward_allowance -= (1/6)
+                            
+                    self.state[job][2] = self.todo_time_step_job[job] / len(self.instance_matrix[job]) #DYNAMIC
+                    if self.todo_time_step_job[job] < len(self.instance_matrix[job]): #DYANMIC
+                        self.needed_machine_jobs[job] = self.instance_matrix[job][
+                            self.todo_time_step_job[job]
+                        ][0]
+                        self.state[job][4] = (
+                            max(
+                                0,
+                                self.time_until_available_machine[
+                                    self.needed_machine_jobs[job]
+                                ]
+                                - difference,
+                            )
+                            / self.max_time_op
+                        )
+                    else:
+                        self.needed_machine_jobs[job] = -1
+                        # this allow to have 1 is job is over (not 0 because, 0 strongly indicate that the job is a
+                        # good candidate)
+                        self.state[job][4] = 1.0
+                        if self.legal_actions[job]:
+                            self.legal_actions[job] = False
+                            self.nb_legal_actions -= 1
+            elif self.todo_time_step_job[job] < len(self.instance_matrix[job]): #DYNAMIC
+                self.total_idle_time_jobs[job] += difference
+                self.idle_time_jobs_last_op[job] += difference
+                self.state[job][5] = self.idle_time_jobs_last_op[job] / self.sum_op
+                self.state[job][6] = self.total_idle_time_jobs[job] / self.sum_op
+        for machine in range(self.machines):
+            if self.time_until_available_machine[machine] < difference:
+                #what does this ratio calculates
+                empty = difference - self.time_until_available_machine[machine]
+                hole_planning += empty #empty = machine idle time
+            self.time_until_available_machine[machine] = max(
+                0, self.time_until_available_machine[machine] - difference
+            )
+            if self.time_until_available_machine[machine] == 0:
+                for job in range(self.jobs):
+                    if (
+                        self.needed_machine_jobs[job] == machine
+                        and not self.legal_actions[job]
+                        and not self.illegal_actions[machine][job] 
+                    ):
+                        self.legal_actions[job] = True
+                        self.nb_legal_actions += 1
+                        if not self.machine_legal[machine]:
+                            self.machine_legal[machine] = True
+                            self.nb_machine_legal += 1
+
+        #updating the allowance and slack for S/RPT + SPT dispatching rule
+        self.allowance_jobs = self.due_date_jobs - self.current_time_step
+        remaining_processing_time = (self.jobs_length - self.total_perform_op_time_jobs)
+        self.slack_jobs =  self.allowance_jobs - remaining_processing_time
+
+        self.allowance_over_slack = np.where(self.allowance_jobs != 0,
+                      self.slack_jobs / self.allowance_jobs,
+                      np.nan)
+        #check for invalud action
+        assert np.all(np.isfinite(self.state[:8])), "State contains invalid (non-finite) values!" 
+
+        #update the makespan
+        self.makespan = max(self.makespan, max(self.total_perform_op_time_jobs + self.total_idle_time_jobs))
+        
+        return hole_planning, reward_allowance
+
+    def _is_done(self):
+        #add additional if self.next_time_step is not 0 means not done cuz not finished processing
+        if (
+            self.nb_legal_actions == 0 
+            #and len(self.next_time_step) == 0 #the len(self.next_time_step) is crucial so it does not confuse with the state where there are no job but not done
+            and np.array_equal(self.todo_time_step_job, np.array(list(map(lambda job : len(job), self.instance_matrix)))) 
+            ): 
+            self.last_time_step = self.current_time_step
+            self.last_solution = self.solution
+            return True
+        return False
+
+    def render(self, mode="human"):
+        df = []
+        for job in range(self.jobs):
+            i = 0
+            # i tracks the operation of each job
+            while i < len(self.instance_matrix[job]) and self.solution[job][i] != -1: #NOT SURE DYNAMIC
+                dict_op = dict()
+                dict_op["Task"] = "Job {}".format(job)
+                start_sec = self.start_timestamp + self.solution[job][i]
+                finish_sec = start_sec + self.instance_matrix[job][i][1]
+                dict_op["Start"] = datetime.datetime.fromtimestamp(start_sec)
+                dict_op["Finish"] = datetime.datetime.fromtimestamp(finish_sec)
+                dict_op["Resource"] = "Machine {}".format(
+                    self.instance_matrix[job][i][0]
+                )
+                df.append(dict_op)
+                i += 1
+        fig = None
+        if len(df) > 0:
+            df = pd.DataFrame(df)
+            fig = ff.create_gantt(
+                df,
+                index_col="Resource",
+                colors=self.colors,
+                show_colorbar=True,
+                group_tasks=True,
+            )
+            fig.update_yaxes(
+                autorange="reversed"
+            )  # otherwise tasks are listed from the bottom up
+        return fig
+
+if __name__ == '__main__':
+
+    env = JssEnv()
+    obs, info = env.reset() # u will get a callback err, because u have to run it from djss_env.py
+    done = False
+    cum_reward = 0
+    while not done:
+        legal_actions = obs["action_mask"]
+        actions = np.random.choice(
+            len(legal_actions), 1, p=(legal_actions / legal_actions.sum())
+        )[0]
+        obs, rewards, done, _ = env.step(actions)
+        cum_reward += rewards
+    print(f"Cumulative reward: {cum_reward}")
+    
+
