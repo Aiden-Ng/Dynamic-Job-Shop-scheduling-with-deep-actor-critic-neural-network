@@ -119,7 +119,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | FIFO | 25 | 42.9% |
 | S_RPT + SPT | 25 | 57.4% |
 | MTWR | 25 | 60.7% |
-| A2C | 25 |  |
+| A2C | 25 |  35.5% |
 | FIFO | 30 | 63.0% | 
 | S_RPT + SPT | 30 | 79.5% |
 | MTWR | 30 | 78.2% |
@@ -137,13 +137,13 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 
 | action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
 | ------------- | ------------- | ------------- | 
-| FIFO | 25 | |
-| S_RPT + SPT | 25 | |
-| MTWR | 25 | |
-| A2C | 25 | |
-| FIFO | 30 | |
-| S_RPT + SPT | 30 | |
-| MTWR | 30 | |
+| FIFO | 25 | 43.7% |
+| S_RPT + SPT | 25 | 57.1% |
+| MTWR | 25 | 57.6% |
+| A2C | 25 | 35.1% |
+| FIFO | 30 | 64.5% |
+| S_RPT + SPT | 30 | 78.9% |
+| MTWR | 30 | 79.1% |
 | A2C | 30 | |
 | FIFO | 35 | 79.8% |
 | S_RPT + SPT | 35 | 95.8% |
@@ -158,13 +158,13 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 
 | action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
 | ------------- | ------------- | ------------- | 
-| FIFO | 25 | |
-| S_RPT + SPT | 25 | |
-| MTWR | 25 | |
+| FIFO | 25 | 43.6% |
+| S_RPT + SPT | 25 | 58.2% |
+| MTWR | 25 | 58.5% |
 | A2C | 25 | |
-| FIFO | 30 | |
-| S_RPT + SPT | 30 | |
-| MTWR | 30 | |
+| FIFO | 30 | 63.1% |
+| S_RPT + SPT | 30 | 77.7% |
+| MTWR | 30 | 78.6% |
 | A2C | 30 | |
 | FIFO | 35 | 80.0% |
 | S_RPT + SPT | 35 | 95.6% |
