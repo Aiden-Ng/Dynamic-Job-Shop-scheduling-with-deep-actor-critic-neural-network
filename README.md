@@ -123,7 +123,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | FIFO | 30 | 63.0% | 
 | S_RPT + SPT | 30 | 79.5% |
 | MTWR | 30 | 78.2% |
-| A2C | 30 | |
+| A2C | 30 | 65.0% |
 | FIFO | 35 | 78.2% |
 | S_RPT + SPT | 35 | 95.5% |
 | MTWR | 35 | 94.7% |
