@@ -127,6 +127,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 
 ### Deep actor-critic reinforcement learning results
 ## Comparing both Dispatching rule and Deep actor-critic reinforcement learning
+## Comparing the number of tardy jobs
 **1000 Episodes**
 
 | action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
@@ -190,16 +191,85 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | MTWR | 40 | 99.3% |
 | A2C | 40 | 93.3% |
 
+## Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.
+
+**Performance for each individual scheduling methods at max_jobs =`25`**
+
+First in First out (FIFO)
+
+<img src = "./(GITHUB) Graphs/(25) 2025-04-08_04-45-01_FIFO_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Slack over remaining processing time + shortest processing time (S/RPT + SPT)
+
+<img src = "./(GITHUB) Graphs/(25) 2025-04-08_05-09-22_S_RPT_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Most total work remaining (MTWR)
+
+<img src = "./(GITHUB) Graphs/(25) 2025-04-08_05-34-10_MTWR_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Deep actor-critic reinforcement learning (A2C)
+
+<img src = "./(GITHUB) Graphs/(25) 2025-04-09_10-30-15_A2C_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+**Performance for each individual scheduling methods at max_jobs =`30`**
+
+First in First out (FIFO)
+
+<img src = "./(GITHUB) Graphs/(30) 2025-04-08_04-53-17_FIFO_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Slack over remaining processing time + shortest processing time (S/RPT + SPT)
+
+<img src = "./(GITHUB) Graphs/(30) 2025-04-08_05-18-31_S_RPT_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Most total work remaining (MTWR)
+
+<img src = "./(GITHUB) Graphs/(30) 2025-04-08_05-42-30_MTWR_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Deep actor-critic reinforcement learning (A2C)
 
 
 
+**Performance for each individual scheduling methods at max_jobs =`35`**
+
+First in First out (FIFO)
+
+<img src = "./(GITHUB) Graphs/(35) 2025-04-07_06-33-01_FIFO_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Slack over remaining processing time + shortest processing time (S/RPT + SPT)
+
+<img src = "./(GITHUB) Graphs/(35) 2025-04-07_06-42-45_S_RPT_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Most total work remaining (MTWR)
+
+<img src = "./(GITHUB) Graphs/(35) 2025-04-07_06-51-48_MTWR_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Deep actor-critic reinforcement learning (A2C)
+
+<img src = "./(GITHUB) Graphs/(35) 2025-04-07_23-53-27_A2C_3000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+**Performance for each individual scheduling methods at max_jobs =`40`**
+
+First in First out (FIFO)
+
+<img src = "./(GITHUB) Graphs/(40) 2025-04-07_07-02-19_FIFO_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Slack over remaining processing time + shortest processing time (S/RPT + SPT)
+
+<img src = "./(GITHUB) Graphs/(40) 2025-04-07_07-13-40_S_RPT_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Most total work remaining (MTWR)
+
+<img src = "./(GITHUB) Graphs/(40) 2025-04-07_07-24-11_MTWR_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+
+Deep actor-critic reinforcement learning (A2C)
+
+<img src = "./(GITHUB) Graphs/(40) 2025-04-09_10-21-25_A2C_5000_makespan_kdeplot.png" width = "60%" height = "60%">
 
 
 ### YET TO DO 
-1. Design reward function - in progress
-2. Implement single agent deep RL with actor critic (A2C) framework - with sb3 and tune hyperparameter with rl-baseline3zoo
-3. Implement multi agent deep RL with acrtor critic (A3C) - ❌. But I will write some aspect of this in the FYP papers, highlighting its benefits. Because implementing multiple actor critic requires the use of RLLib or PyTorch which is time intensive. 
-4. Benchmark the single A2C RL agent with the dispatching rule (S_RPT + SPT) and MTWR
+1. Design reward function ✅
+2. Implement single agent deep RL with actor critic (A2C) framework - with sb3 and tune hyperparameter with rl-baseline3zoo ✅
+3. Benchmark the single A2C RL agent with the dispatching rule (S_RPT + SPT) and MTWR ✅
 
 ## Project Organization
 ------------
