@@ -111,11 +111,74 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | Learning rate | 0.007 | 
 
 ### Deep actor-critic reinforcement learning results
-
-
-
-
 ## Comparing both Dispatching rule and Deep actor-critic reinforcement learning
+**1000 Episodes**
+
+| action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
+| ------------- | ------------- | ------------- | 
+| FIFO | 25 | 42.9% |
+| S_RPT + SPT | 25 | 57.4% |
+| MTWR | 25 | 60.7% |
+| A2C | 25 |  35.5% |
+| FIFO | 30 | 63.0% | 
+| S_RPT + SPT | 30 | 79.5% |
+| MTWR | 30 | 78.2% |
+| A2C | 30 | 61.3% |
+| FIFO | 35 | 78.2% |
+| S_RPT + SPT | 35 | 95.5% |
+| MTWR | 35 | 94.7% |
+| A2C | 35 | 80.4% |
+| FIFO | 40 | 88.8% |
+| S_RPT + SPT | 40 | 99.6% |
+| MTWR | 40 | 99.3% |
+| A2C | 40 | 93.7% |
+
+**3000 Episodes**
+
+| action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
+| ------------- | ------------- | ------------- | 
+| FIFO | 25 | 43.7% |
+| S_RPT + SPT | 25 | 57.1% |
+| MTWR | 25 | 57.6% |
+| A2C | 25 | 35.1% |
+| FIFO | 30 | 64.5% |
+| S_RPT + SPT | 30 | 78.9% |
+| MTWR | 30 | 79.1% |
+| A2C | 30 | 61.0% |
+| FIFO | 35 | 79.8% |
+| S_RPT + SPT | 35 | 95.8% |
+| MTWR | 35 | 94.0% |
+| A2C | 35 | 80.4% |
+| FIFO | 40 | 89.3% |
+| S_RPT + SPT | 40 | 99.6% |
+| MTWR | 40 | 99.4% |
+| A2C | 40 | 93.4% |
+
+**5000 Episodes**
+
+| action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
+| ------------- | ------------- | ------------- | 
+| FIFO | 25 | 43.6% |
+| S_RPT + SPT | 25 | 58.2% |
+| MTWR | 25 | 58.5% |
+| A2C | 25 | 35.0% |
+| FIFO | 30 | 63.1% |
+| S_RPT + SPT | 30 | 77.7% |
+| MTWR | 30 | 78.6% |
+| A2C | 30 | 60.9% |
+| FIFO | 35 | 80.0% |
+| S_RPT + SPT | 35 | 95.6% |
+| MTWR | 35 | 94.5% |
+| A2C | 35 | 80.4% |
+| FIFO | 40 | 89.3% |
+| S_RPT + SPT | 40 | 99.6% |
+| MTWR | 40 | 99.3% |
+| A2C | 40 | 93.3% |
+
+
+
+
+
 
 ### YET TO DO 
 1. Design reward function - in progress
