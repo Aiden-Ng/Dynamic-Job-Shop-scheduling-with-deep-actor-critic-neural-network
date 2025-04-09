@@ -3,19 +3,18 @@
 - [Dynamic Job Shop Scheduling (DJSSP) environment configuration](#dynamic-job-shop-scheduling-djssp-environment-configuration)
 - [Dispatching Rule](#dispatching-rule)
   - [Gif (Just demonstration for each dispatching rule)](#gif-just-demonstration-for-each-dispatching-rule)
-  - [Example of each dispatching rule per EPISODE](#example-of-each-dispatching-rule-per-episode)
-  - [Number of tardy jobs](#number-of-tardy-jobs)
-  - [Makespan plotted on Kernal Density Estimation (KDE) for multiple EPISODES](#makespan-plotted-on-kernal-density-estimation-kde-for-multiple-episodes)
-  - [Conclusion](#conclusion)
+  - [Example of each scheduling method per EPISODE](#example-of-each-scheduling-method-per-episode)
 - [Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)](#deep-reinforcement-learning-actor-critic-stable-baseline-3--openai-gym)
   - [Reward Function design (Dense reward function)](#reward-function-design-dense-reward-function)
   - [Synchronous actor critic reinforcement learning (A2C from stable baseline 3)](#synchronous-actor-critic-reinforcement-learning-a2c-from-stable-baseline-3)
   - [Multi - layer perceptron configurations (MLP - policy from stable baseline 3)](#multi---layer-perceptron-configurations-mlp---policy-from-stable-baseline-3)
   - [Deep actor-critic reinforcement learning results](#deep-actor-critic-reinforcement-learning-results)
   - [Comparing both Dispatching rule and Deep actor-critic reinforcement learning](#comparing-both-dispatching-rule-and-deep-actor-critic-reinforcement-learning)
-  - [Comparing the number of tardy jobs](#comparing-the-number-of-tardy-jobs)
-  - [Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.](#makespan-comparison-the-makespan-kde-plot-is-calculated-from-simulations-with-5000-episodes)
+    - [Tardy jobs comparison](#tardy-jobs-comparison)
+    - [Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.](#makespan-comparison-the-makespan-kde-plot-is-calculated-from-simulations-with-5000-episodes)
+- [YET TO DO](#yet-to-do)
 - [Project Organization](#project-organization)
+- [License](#license)
 
 
 
@@ -91,7 +90,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 
 ### Deep actor-critic reinforcement learning results
 ## Comparing both Dispatching rule and Deep actor-critic reinforcement learning
-## Comparing the number of tardy jobs
+### Tardy jobs comparison
 **1000 Episodes**
 
 | action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
@@ -155,9 +154,9 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | MTWR | 40 | 99.3% |
 | A2C | 40 | 93.3% |
 
-## Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.
+### Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.
 
-**Performance for each individual scheduling methods at max_jobs =`25`**
+#### **Performance for each individual scheduling methods at max_jobs =`25`**
 
 First in First out (FIFO)
 
@@ -175,7 +174,7 @@ Deep actor-critic reinforcement learning (A2C)
 
 <img src = "./(GITHUB) Graphs/(25) 2025-04-09_10-30-15_A2C_5000_makespan_kdeplot.png" width = "60%" height = "60%">
 
-**Performance for each individual scheduling methods at max_jobs =`30`**
+#### **Performance for each individual scheduling methods at max_jobs =`30`**
 
 First in First out (FIFO)
 
@@ -193,7 +192,7 @@ Deep actor-critic reinforcement learning (A2C)
 
 
 
-**Performance for each individual scheduling methods at max_jobs =`35`**
+#### **Performance for each individual scheduling methods at max_jobs =`35`**
 
 First in First out (FIFO)
 
@@ -211,7 +210,7 @@ Deep actor-critic reinforcement learning (A2C)
 
 <img src = "./(GITHUB) Graphs/(35) 2025-04-07_23-53-27_A2C_3000_makespan_kdeplot.png" width = "60%" height = "60%">
 
-**Performance for each individual scheduling methods at max_jobs =`40`**
+#### **Performance for each individual scheduling methods at max_jobs =`40`**
 
 First in First out (FIFO)
 
