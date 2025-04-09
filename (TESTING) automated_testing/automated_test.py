@@ -20,10 +20,10 @@ class action_type(Enum):
 # EPISODE_LIST = 50
 EPISODE_LIST = [3000]
 
-# ACTION_TYPE_LIST = [action_type.A2C]
-ACTION_TYPE_LIST = [action_type.RANDOM]
+ACTION_TYPE_LIST = [action_type.A2C]
+# ACTION_TYPE_LIST = [action_type.RANDOM]
 
-MAX_JOBS_LIST = [25,30,35,40]
+MAX_JOBS_LIST = [30]
 # MAX_JOBS_LIST = [40]
 
 def call_test(episode_args, action_type_args, max_jobs_args):

@@ -67,7 +67,7 @@ DEBUG_PATH = (Path(__file__).parent / "Project" / "(DEBUG)").resolve()
 MODEL_VERSION = "A2C_V57" 
 TRAINING = False
 TIME_STEP = 100000
-LOAD_TIME_STEP = 1200000
+LOAD_TIME_STEP = 800000
 SAVING_TIME_STEP = 1000000 #timestep for saving
 
 # this is for saving the reinforcement learning models and logging files
@@ -84,9 +84,9 @@ parser.add_argument("--logging_xlsx_path", help = "this is the absolute path for
 args = parser.parse_args()
 args.logging_xlsx_path = (Path(__file__).parent / "(TESTING) automated_testing" / "automated_test_log.xlsx" ).resolve()
 
-# args.episode = 1
+# args.episode = 100
 # args.action_type = "A2C"
-# args.max_jobs = 25
+# args.max_jobs = 30
 # args.action_type = "PPO"
 # args.action_type = "S_RPT"
 # args.action_type = "MTWR"

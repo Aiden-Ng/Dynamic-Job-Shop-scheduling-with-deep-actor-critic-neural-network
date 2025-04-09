@@ -1,3 +1,18 @@
+#Table of content
+- [Dynamic Job Shop Scheduling (DJSSP) environment configuration](#Dynamic-Job-Shop-Scheduling-(DJSSP)-environment-configuration)
+- [Dispatching-Rule](#Dispatching-Rule)
+    - [Gif (Just demonstration for each dispatching rule)][#Gif(Just-demonstration-for-each-dispatching-rule)]
+    - [Example of each dispatching rule per EPISODE](#Example-of-each-dispatching-rule-per-EPISODE)
+- [Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)](#Deep-reinforcement-learning-actor-critic-(Stable-baseline-3-+-OpenAI-Gym))
+    - [Reward Function design (Dense reward function)](#Reward-Function-design-(Dense-reward-function))
+    - [Synchronous actor critic reinforcement learning (A2C from stable baseline 3)](#Synchronous-actor-critic-reinforcement-learnin-(A2C-from-stable-baseline-3))
+    - [Multi - layer perceptron configurations (MLP - policy from stable baseline 3)](#Multi---layer-perceptron-configurations-(MLP---policy-from-stable-baseline-3))
+    
+
+
+
+### Gif (Just demonstration for each dispatching rule)
+
 # Final Year Project - Dynamic Job-Shop Scheduling Environment 
 An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Scheduling Problem
 
@@ -9,7 +24,7 @@ However, I soon realized that testing and benchmarking in the dynamic environmen
 
 Once the deep MARL agent is set up, it will be applied to the dynamic JSSP environment, where benchmarking will be conducted over many episodes to compare the deep MARL approach with existing dispatching rules.
 
-## Dynamic Job Shope Scheduling (DJSSP) environment configuration
+## Dynamic Job Shop Scheduling (DJSSP) environment configuration
 ------------
 The dynamic job scheduling environment is characteristed by these parameters: 
 - **Number of Machines**: `6`
