@@ -248,7 +248,7 @@ Most total work remaining (MTWR)
 
 Deep actor-critic reinforcement learning (A2C)
 
-<img src = "./(GITHUB) Graphs/(40) 2025-04-09_10-21-25_A2C_5000_makespan_kdeplot.png"width = "60%" height = "60%">
+<img src = "./(GITHUB) Graphs/(40) 2025-04-09_10-21-25_A2C_5000_makespan_kdeplot.png" width = "60%" height = "60%">
 
 
 ### YET TO DO 
