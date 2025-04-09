@@ -1,13 +1,24 @@
-#Table of content
-- [Dynamic Job Shop Scheduling (DJSSP) environment configuration](#Dynamic-Job-Shop-Scheduling-(DJSSP)-environment-configuration)
-- [Dispatching-Rule](#Dispatching-Rule)
-    - [Gif (Just demonstration for each dispatching rule)][#Gif(Just-demonstration-for-each-dispatching-rule)]
-    - [Example of each dispatching rule per EPISODE](#Example-of-each-dispatching-rule-per-EPISODE)
-- [Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)](#deep-reinforcement-learning-actor-critic-stable-baseline-3--openai-gym))
-    - [Reward Function design (Dense reward function)](#Reward-Function-design-(Dense-reward-function))
-    - [Synchronous actor critic reinforcement learning (A2C from stable baseline 3)](#Synchronous-actor-critic-reinforcement-learnin-(A2C-from-stable-baseline-3))
-    - [Multi - layer perceptron configurations (MLP - policy from stable baseline 3)](#Multi--layer-perceptron-configurations-(MLP--policy-from-stable-baseline-3))
-    
+## Table of Contents
+
+- [Dynamic Job Shop Scheduling (DJSSP) environment configuration](#dynamic-job-shop-scheduling-djssp-environment-configuration)
+- [Dispatching Rule](#dispatching-rule)
+  - [Gif (Just demonstration for each dispatching rule)](#gif-just-demonstration-for-each-dispatching-rule)
+  - [Example of each dispatching rule per EPISODE](#example-of-each-dispatching-rule-per-episode)
+  - [Number of tardy jobs](#number-of-tardy-jobs)
+  - [Makespan plotted on Kernal Density Estimation (KDE) for multiple EPISODES](#makespan-plotted-on-kernal-density-estimation-kde-for-multiple-episodes)
+  - [Conclusion](#conclusion)
+- [Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)](#deep-reinforcement-learning-actor-critic-stable-baseline-3--openai-gym)
+  - [Reward Function design (Dense reward function)](#reward-function-design-dense-reward-function)
+  - [Synchronous actor critic reinforcement learning (A2C from stable baseline 3)](#synchronous-actor-critic-reinforcement-learning-a2c-from-stable-baseline-3)
+  - [Multi - layer perceptron configurations (MLP - policy from stable baseline 3)](#multi---layer-perceptron-configurations-mlp---policy-from-stable-baseline-3)
+  - [Deep actor-critic reinforcement learning results](#deep-actor-critic-reinforcement-learning-results)
+  - [Comparing both Dispatching rule and Deep actor-critic reinforcement learning](#comparing-both-dispatching-rule-and-deep-actor-critic-reinforcement-learning)
+  - [Comparing the number of tardy jobs](#comparing-the-number-of-tardy-jobs)
+  - [Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.](#makespan-comparison-the-makespan-kde-plot-is-calculated-from-simulations-with-5000-episodes)
+- [YET TO DO](#yet-to-do)
+- [Project Organization](#project-organization)
+- [License](#license)
+
 
 
 
