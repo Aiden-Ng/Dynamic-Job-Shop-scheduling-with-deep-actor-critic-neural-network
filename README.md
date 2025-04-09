@@ -3,7 +3,7 @@
 - [Dispatching-Rule](#Dispatching-Rule)
     - [Gif (Just demonstration for each dispatching rule)][#Gif(Just-demonstration-for-each-dispatching-rule)]
     - [Example of each dispatching rule per EPISODE](#Example-of-each-dispatching-rule-per-EPISODE)
-- [Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)](#Deep-reinforcement-learning-actor-critic-(Stable-baseline-3-+-OpenAI-Gym))
+- [Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)](#deep-reinforcement-learning-actor-critic-stable-baseline-3--openai-gym))
     - [Reward Function design (Dense reward function)](#Reward-Function-design-(Dense-reward-function))
     - [Synchronous actor critic reinforcement learning (A2C from stable baseline 3)](#Synchronous-actor-critic-reinforcement-learnin-(A2C-from-stable-baseline-3))
     - [Multi - layer perceptron configurations (MLP - policy from stable baseline 3)](#Multi---layer-perceptron-configurations-(MLP---policy-from-stable-baseline-3))
