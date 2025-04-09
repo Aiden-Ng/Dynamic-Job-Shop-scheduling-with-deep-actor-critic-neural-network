@@ -34,6 +34,9 @@ from stable_baselines3 import PPO
 # This is for saving the network parameter (weights and biases)
 import torch
 
+# To terminate the program
+import sys
+
 """
 Things to do
 1. Fix the reward function to commodate multi objective
@@ -53,6 +56,7 @@ class action_type(Enum):
     S_RPT = 2
     MTWR = 3
     A2C = 4
+    RANDOM = 5
 
 # relative to your local pc
 IMG_PATH = (Path(__file__).parent / "(TESTING) automated_testing" / "(PLOT) makespan").resolve()
@@ -63,7 +67,7 @@ DEBUG_PATH = (Path(__file__).parent / "Project" / "(DEBUG)").resolve()
 MODEL_VERSION = "A2C_V57" 
 TRAINING = False
 TIME_STEP = 100000
-LOAD_TIME_STEP = 1400000
+LOAD_TIME_STEP = 1200000
 SAVING_TIME_STEP = 1000000 #timestep for saving
 
 # this is for saving the reinforcement learning models and logging files
@@ -80,13 +84,14 @@ parser.add_argument("--logging_xlsx_path", help = "this is the absolute path for
 args = parser.parse_args()
 args.logging_xlsx_path = (Path(__file__).parent / "(TESTING) automated_testing" / "automated_test_log.xlsx" ).resolve()
 
-# args.episode = 10
+# args.episode = 1
 # args.action_type = "A2C"
-# args.max_jobs = 40
+# args.max_jobs = 25
 # args.action_type = "PPO"
 # args.action_type = "S_RPT"
 # args.action_type = "MTWR"
 # args.action_type = "FIFO"
+# args.action_type = "RANDOM"
 
 def logging_to_xslx(tardy_ratio_args):
     try:
@@ -181,7 +186,7 @@ if __name__ == "__main__":
                 #loading the valid weight and biases for the network
                 # state_dict = torch.load((network_param_dir / "param1.pth").resolve()) 
                 # model.set_parameters(state_dict) #load the state dict to the model    
-                for i in range(1,4): 
+                for i in range(1,2): 
                 #if you want to conitnuously train your model, you have to do reset_num_time_steps = True
                     model.learn(total_timesteps=TIME_STEP, reset_num_timesteps=False, tb_log_name= f"{MODEL_VERSION}")
                     model.save(f"{models_dir}/{LOAD_TIME_STEP + (TIME_STEP * i)}_a2c_djss.zip") #saving the model is the desired directory
@@ -221,6 +226,10 @@ if __name__ == "__main__":
 
             main_count += 1
             print(main_count)
+            # if main_count > 40000:
+            #     sys.exit(0) 
+            #     print("exit abruptly")
+            
 
             if np.all(done): #per epsiode 
                 print("End of episode")

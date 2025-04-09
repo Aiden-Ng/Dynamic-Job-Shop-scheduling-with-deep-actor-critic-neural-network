@@ -13,17 +13,18 @@ class action_type(Enum):
     S_RPT = 2
     MTWR = 3
     A2C = 4
+    RANDOM = 5
 
 
 #creating the parser object
-EPISODE_LIST = [1000,3000,5000]
-# EPISODE_LIST = [10]
+# EPISODE_LIST = 50
+EPISODE_LIST = [3000]
 
 # ACTION_TYPE_LIST = [action_type.A2C]
-ACTION_TYPE_LIST = [action_type.FIFO, action_type.S_RPT, action_type.MTWR]
+ACTION_TYPE_LIST = [action_type.RANDOM]
 
-MAX_JOBS_LIST = [35,40]
-# MAX_JOBS_LIST = [35]
+MAX_JOBS_LIST = [25,30,35,40]
+# MAX_JOBS_LIST = [40]
 
 def call_test(episode_args, action_type_args, max_jobs_args):
     try:
@@ -35,10 +36,9 @@ def call_test(episode_args, action_type_args, max_jobs_args):
         print("Error",e) #idk what to expect
 
 if __name__ == '__main__':
-    for episode in EPISODE_LIST:
-        # for action_type in action_enum:
-        for max_jobs in MAX_JOBS_LIST:
-            for action in ACTION_TYPE_LIST:
+    for action in ACTION_TYPE_LIST:
+        for episode in EPISODE_LIST:
+            for max_jobs in MAX_JOBS_LIST:
                 call_test(episode, action, max_jobs)
          
             

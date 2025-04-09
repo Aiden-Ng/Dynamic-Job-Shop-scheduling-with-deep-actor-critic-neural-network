@@ -31,6 +31,8 @@ class action_type(Enum):
     FIFO = 1
     S_RPT = 2
     MTWR = 3
+    A2C = 4
+    RANDOM = 5
 
 class Debug():
     def __init__(self):
@@ -234,6 +236,11 @@ class DynamicJssEnv(JssEnv):
                 return index
             else:
                 assert False, "Error"
+        
+        elif action_type_args.value == action_type.RANDOM.value:
+            index = np.random.choice(len(self.legal_actions), 1, p=(self.legal_actions / self.legal_actions.sum()) )[0] #how is it possible to take NOACTION
+            return index
+
 
     def step(self, action: int, **kwargs): #kwargs used to overwrite the action
         # With 10% probability, generate a new job.
@@ -254,7 +261,7 @@ class DynamicJssEnv(JssEnv):
                     if (len(self.instance_matrix) >= self.max_jobs): 
                         break
 
-        #handle the nope action first since it is not in the state
+        #if take illegal actions
         if __name__ != "__main__": #if agent make decision
         #check if it is illegal action
             if self.state[:, 0][action] != 1 : #DEBUG, need to handle NOPE action
@@ -265,8 +272,6 @@ class DynamicJssEnv(JssEnv):
                         truncated,
                         {}
                 )
-        else: #if dispatching rule make decision
-            action = self.get_action(action_type[action])
         
         # if not kwargs:
         #     action = self.get_action(action_type[action])
