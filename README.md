@@ -152,7 +152,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | FIFO | 40 | 89.3% |
 | S_RPT + SPT | 40 | 99.6% |
 | MTWR | 40 | 99.4% |
-| A2C | 40 | |
+| A2C | 40 | 93.4% |
 
 **5000 Episodes**
 
