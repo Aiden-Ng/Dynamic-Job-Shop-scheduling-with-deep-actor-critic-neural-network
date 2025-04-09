@@ -123,7 +123,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | FIFO | 30 | 63.0% | 
 | S_RPT + SPT | 30 | 79.5% |
 | MTWR | 30 | 78.2% |
-| A2C | 30 | 65.0% |
+| A2C | 30 | 61.3% |
 | FIFO | 35 | 78.2% |
 | S_RPT + SPT | 35 | 95.5% |
 | MTWR | 35 | 94.7% |
@@ -144,7 +144,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | FIFO | 30 | 64.5% |
 | S_RPT + SPT | 30 | 78.9% |
 | MTWR | 30 | 79.1% |
-| A2C | 30 | |
+| A2C | 30 | 61.0% |
 | FIFO | 35 | 79.8% |
 | S_RPT + SPT | 35 | 95.8% |
 | MTWR | 35 | 94.0% |
@@ -165,7 +165,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | FIFO | 30 | 63.1% |
 | S_RPT + SPT | 30 | 77.7% |
 | MTWR | 30 | 78.6% |
-| A2C | 30 | |
+| A2C | 30 | 60.9% |
 | FIFO | 35 | 80.0% |
 | S_RPT + SPT | 35 | 95.6% |
 | MTWR | 35 | 94.5% |
