@@ -6,7 +6,7 @@
 - [Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)](#deep-reinforcement-learning-actor-critic-stable-baseline-3--openai-gym))
     - [Reward Function design (Dense reward function)](#Reward-Function-design-(Dense-reward-function))
     - [Synchronous actor critic reinforcement learning (A2C from stable baseline 3)](#Synchronous-actor-critic-reinforcement-learnin-(A2C-from-stable-baseline-3))
-    - [Multi - layer perceptron configurations (MLP - policy from stable baseline 3)](#Multi---layer-perceptron-configurations-(MLP---policy-from-stable-baseline-3))
+    - [Multi - layer perceptron configurations (MLP - policy from stable baseline 3)](#Multi--layer-perceptron-configurations-(MLP--policy-from-stable-baseline-3))
     
 
 
