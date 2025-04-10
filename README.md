@@ -50,9 +50,9 @@ Once the deep MARL agent is set up, it will be applied to the dynamic JSSP envir
 ------------
 The dynamic job scheduling environment is characteristed by these parameters: 
 - **Number of Machines**: `6`
-- **Maximum Allowable Jobs**: `25`
+- **Maximum Allowable Jobs**: `25` to `40` with intervals of 5
 - **Processing Time Range**: `[50, 60]`
-- **Allowable Number of Operations per Job**: `[5, 6]`
+- **Allowable Number of Operations per Job**: `[8, 9]`
 - **Due Date Tightness (α)**: `[10, 12]`
 The variation between each variable are kept minimum to allow for a more stable result. 
 
