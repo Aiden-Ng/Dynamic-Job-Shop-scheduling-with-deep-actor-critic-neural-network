@@ -231,8 +231,7 @@ Deep actor-critic reinforcement learning (A2C)
 
 ### YET TO DO 
 1. Design reward function ✅
-2. Implement single agent deep RL with actor critic (A2C) framework - with sb3 and tune hyperparameter with rl-baseline3zoo ✅
-3. Benchmark the single A2C RL agent with the dispatching rule (S_RPT + SPT) and MTWR ✅
+2. Benchmark the single A2C RL agent with the dispatching rule (S_RPT + SPT) and MTWR ✅
 
 ## Project Organization
 ------------
