@@ -1,13 +1,22 @@
-#Table of content
-- [Dynamic Job Shop Scheduling (DJSSP) environment configuration](#Dynamic-Job-Shop-Scheduling-(DJSSP)-environment-configuration)
-- [Dispatching-Rule](#Dispatching-Rule)
-    - [Gif (Just demonstration for each dispatching rule)][#Gif(Just-demonstration-for-each-dispatching-rule)]
-    - [Example of each dispatching rule per EPISODE](#Example-of-each-dispatching-rule-per-EPISODE)
-- [Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)](#Deep-reinforcement-learning-actor-critic-(Stable-baseline-3-+-OpenAI-Gym))
-    - [Reward Function design (Dense reward function)](#Reward-Function-design-(Dense-reward-function))
-    - [Synchronous actor critic reinforcement learning (A2C from stable baseline 3)](#Synchronous-actor-critic-reinforcement-learnin-(A2C-from-stable-baseline-3))
-    - [Multi - layer perceptron configurations (MLP - policy from stable baseline 3)](#Multi---layer-perceptron-configurations-(MLP---policy-from-stable-baseline-3))
-    
+## Table of Contents
+
+- [Dynamic Job Shop Scheduling (DJSSP) environment configuration](#dynamic-job-shop-scheduling-djssp-environment-configuration)
+- [Dispatching Rule](#dispatching-rule)
+  - [Gif (Just demonstration for each dispatching rule)](#gif-just-demonstration-for-each-dispatching-rule)
+  - [Example of each scheduling method per EPISODE](#example-of-each-scheduling-method-per-episode)
+- [Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)](#deep-reinforcement-learning-actor-critic-stable-baseline-3--openai-gym)
+  - [Reward Function design (Dense reward function)](#reward-function-design-dense-reward-function)
+  - [Synchronous actor critic reinforcement learning (A2C from stable baseline 3)](#synchronous-actor-critic-reinforcement-learning-a2c-from-stable-baseline-3)
+  - [Multi - layer perceptron configurations (MLP - policy from stable baseline 3)](#multi---layer-perceptron-configurations-mlp---policy-from-stable-baseline-3)
+  - [Deep actor-critic reinforcement learning results](#deep-actor-critic-reinforcement-learning-results)
+  - [Comparing both Dispatching rule and Deep actor-critic reinforcement learning](#comparing-both-dispatching-rule-and-deep-actor-critic-reinforcement-learning)
+    - [Tardy jobs comparison](#tardy-jobs-comparison)
+    - [Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.](#makespan-comparison-the-makespan-kde-plot-is-calculated-from-simulations-with-5000-episodes)
+- [YET TO DO](#yet-to-do)
+- [Project Organization](#project-organization)
+- [License](#license)
+
+
 
 
 
@@ -24,23 +33,7 @@ However, I soon realized that testing and benchmarking in the dynamic environmen
 
 Once the deep MARL agent is set up, it will be applied to the dynamic JSSP environment, where benchmarking will be conducted over many episodes to compare the deep MARL approach with existing dispatching rules.
 
-## Dynamic Job Shop Scheduling (DJSSP) environment configuration
-------------
-The dynamic job scheduling environment is characteristed by these parameters: 
-- **Number of Machines**: `6`
-- **Maximum Allowable Jobs**: `25`
-- **Processing Time Range**: `[50, 60]`
-- **Allowable Number of Operations per Job**: `[5, 6]`
-- **Due Date Tightness (α)**: `[10, 12]`
-The variation between each variable are kept minimum to allow for a more stable result. 
-
-## Dispatching Rule
-------------
-### Gif (Just demonstration for each dispatching rule)
-I have implemented 3 most common dispatching rule in my dynamic JSSP environment, but only  S_RPT + SPT and MTWR will be used to benchmark against the deep multi agent reinforcement learning (MARL).
-The objective of the deep MARL would be to minimize number of tardy jobs and makespan in a batch.
-
-### Example of each dispatching rule per EPISODE
+## Example of each scheduling method per EPISODE
 1. First in first out (FIFO)
 
  ![GIF not loaded](./(GITHUB)%20Graphs/result_FIFO_schedule.gif)
@@ -53,49 +46,19 @@ The objective of the deep MARL would be to minimize number of tardy jobs and mak
 
  ![GIF not loaded](./(GITHUB)%20Graphs/result_MWTR_schedule.gif)
 
-### Number of tardy jobs
-In this table for multiple episodes, S_RPT + SPT is the best in reducing number of tardy jobs. 
-| action_type | Number of Episode | Number of tardy jobs in percentage | 
-| ------------- | ------------- | ------------- | 
-| FIFO  | 1000 | 10.2% |
-| S_RPT + SPT  | 1000 | 3.8% |
-| MTWR  | 1000 | 6.7% | 
-| FIFO  | 3000 | 9.8% |
-| S_RPT + SPT  | 3000 | 4.0% |
-| MTWR  | 3000  | 6.6% | 
+## Dynamic Job Shop Scheduling (DJSSP) environment configuration
+------------
+The dynamic job scheduling environment is characteristed by these parameters: 
+- **Number of Machines**: `6`
+- **Maximum Allowable Jobs**: `25` to `40` with intervals of 5
+- **Processing Time Range**: `[50, 60]`
+- **Allowable Number of Operations per Job**: `[8, 9]`
+- **Due Date Tightness (α)**: `[10, 12]`
+The variation between each variable are kept minimum to allow for a more stable result. 
 
-### Makespan plotted on Kernal Density Estimation (KDE) for multiple EPISODES
-1. FIFO with 1000 episode
-
- <img src="./(GITHUB) Graphs/2025-03-13_18-17-53_FIFO_1000_makespan_kdeplot.png" width="60%" height="60%"/>
-
-2. S_RPT + SPT with 1000 episode
-
- <img src="./(GITHUB) Graphs/2025-03-13_18-30-17_S_RPT_1000_makespan_kdeplot.png" width="60%" height="60%"/>
-
-3. MTWR with 1000 episode
-
-For 1000 episode, MTWR effective reduces makespan when compared with FIFO, but it performs similar as compared to S_RPT + SPT.
-
- <img src="./(GITHUB) Graphs/2025-03-13_18-40-25_MTWR_1000_makespan_kdeplot.png" width="60%" height="60%"/>
-
-4. FIFO with 3000 episode
-
- <img src="./(GITHUB) Graphs/2025-03-13_19-10-34_FIFO_3000_makespan_kdeplot.png" width="60%" height="60%"/>
-
-5. S_RPT + SPT with 3000 episode
-
- <img src="./(GITHUB) Graphs/2025-03-14_01-10-10_S_RPT_3000_makespan_kdeplot.png" width="60%" height="60%"/>
- 
-6. MTWR with 3000 episode
-
-For 3000 episodes, this MTWR dominates both FIFO and S_RPT + SPT
-
- <img src="./(GITHUB) Graphs/2025-03-14_01-57-23_MTWR_3000_makespan_kdeplot.png" width="60%" height="60%"/>
-
-### Conclusion
+## Dispatching Rule
+------------
 S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. MTWR is chosen because it is able to reduce the makespan of the jobs. Therefore, an deep MARL trained on these two objective will be used to benchmark against these existing dispatching rule.
-
 
 ## Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)
 ------------
@@ -127,7 +90,7 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 
 ### Deep actor-critic reinforcement learning results
 ## Comparing both Dispatching rule and Deep actor-critic reinforcement learning
-## Comparing the number of tardy jobs
+### Tardy jobs comparison
 **1000 Episodes**
 
 | action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
@@ -191,9 +154,9 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | MTWR | 40 | 99.3% |
 | A2C | 40 | 93.3% |
 
-## Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.
+### Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.
 
-**Performance for each individual scheduling methods at max_jobs =`25`**
+#### **Performance for each individual scheduling methods at max_jobs =`25`**
 
 First in First out (FIFO)
 
@@ -211,7 +174,7 @@ Deep actor-critic reinforcement learning (A2C)
 
 <img src = "./(GITHUB) Graphs/(25) 2025-04-09_10-30-15_A2C_5000_makespan_kdeplot.png" width = "60%" height = "60%">
 
-**Performance for each individual scheduling methods at max_jobs =`30`**
+#### **Performance for each individual scheduling methods at max_jobs =`30`**
 
 First in First out (FIFO)
 
@@ -229,7 +192,7 @@ Deep actor-critic reinforcement learning (A2C)
 
 
 
-**Performance for each individual scheduling methods at max_jobs =`35`**
+#### **Performance for each individual scheduling methods at max_jobs =`35`**
 
 First in First out (FIFO)
 
@@ -247,7 +210,7 @@ Deep actor-critic reinforcement learning (A2C)
 
 <img src = "./(GITHUB) Graphs/(35) 2025-04-07_23-53-27_A2C_3000_makespan_kdeplot.png" width = "60%" height = "60%">
 
-**Performance for each individual scheduling methods at max_jobs =`40`**
+#### **Performance for each individual scheduling methods at max_jobs =`40`**
 
 First in First out (FIFO)
 
@@ -268,8 +231,7 @@ Deep actor-critic reinforcement learning (A2C)
 
 ### YET TO DO 
 1. Design reward function ✅
-2. Implement single agent deep RL with actor critic (A2C) framework - with sb3 and tune hyperparameter with rl-baseline3zoo ✅
-3. Benchmark the single A2C RL agent with the dispatching rule (S_RPT + SPT) and MTWR ✅
+2. Benchmark the single A2C RL agent with the dispatching rule (S_RPT + SPT) and MTWR ✅
 
 ## Project Organization
 ------------
