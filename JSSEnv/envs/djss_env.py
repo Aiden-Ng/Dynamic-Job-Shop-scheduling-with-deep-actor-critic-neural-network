@@ -127,7 +127,8 @@ class DynamicJssEnv(JssEnv):
 
         # ================= PLEASE DEBUG THIS SECTION ================= 
         #add the due date based on proportion of total work (TWK)
-        self.alpha_list = [10,12]
+        # self.alpha_list = [10,12]
+        self.alpha_list = [10,17] #
         self.alpha = random.randint(self.alpha_list[0],self.alpha_list[1]) #this is for 20 jobs
         # self.alpha = random.randint(20,23) #this is for 60 jobs
 

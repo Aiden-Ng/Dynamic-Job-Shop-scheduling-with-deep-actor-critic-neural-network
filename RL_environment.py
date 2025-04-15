@@ -67,7 +67,7 @@ DEBUG_PATH = (Path(__file__).parent / "Project" / "(DEBUG)").resolve()
 MODEL_VERSION = "A2C_V57" 
 TRAINING = False
 TIME_STEP = 100000
-LOAD_TIME_STEP = 800000
+LOAD_TIME_STEP = 1400000
 SAVING_TIME_STEP = 1000000 #timestep for saving
 
 # this is for saving the reinforcement learning models and logging files
@@ -84,9 +84,9 @@ parser.add_argument("--logging_xlsx_path", help = "this is the absolute path for
 args = parser.parse_args()
 args.logging_xlsx_path = (Path(__file__).parent / "(TESTING) automated_testing" / "automated_test_log.xlsx" ).resolve()
 
-# args.episode = 100
+# args.episode = 1
 # args.action_type = "A2C"
-# args.max_jobs = 30
+# args.max_jobs = 25
 # args.action_type = "PPO"
 # args.action_type = "S_RPT"
 # args.action_type = "MTWR"
@@ -193,6 +193,7 @@ if __name__ == "__main__":
 
                 # model.learn(total_timesteps=TIME_STEP, reset_num_timesteps=False, tb_log_name= f"{MODEL_VERSION}")
                 # model.save(f"{models_dir}/{SAVING_TIME_STEP}_a2c_djss.zip") #saving the model is the desired directory
+                
     
         
         print("=================programme starting=================")
@@ -207,6 +208,7 @@ if __name__ == "__main__":
             
             if ACTION_TYPE != "A2C":
                 action = env.get_action(action_type[args.action_type]) #this is the action type that you want to use
+                
 
             obs, reward, done, truncated, info = env.step(action)
             cumulative_reward += reward
@@ -250,6 +252,7 @@ if __name__ == "__main__":
         # env.close()
 
     logging_to_xslx(float(total_number_of_tardy_job)/float(total_jobs)) #open the excel file and write here
+    # makespan_df.to_csv(rf"D:\NTU document\Academic stuff (NTU)\Y4S1\Archive\{args.action_type}_{args.max_jobs}_makespan.csv", header = False , index = False , mode = "a")
     # saving_to_png()
     saving_to_kde()
 
