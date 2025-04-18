@@ -16,7 +16,6 @@
 - [License](#license)
 
 # Final Year Project - Dynamic Job-Shop Scheduling Environment 
-------------
 An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Scheduling Problem
 
 ## Abstract
@@ -37,7 +36,6 @@ This repository contains all the code for the implementation of deep actor-criti
  ![GIF not loaded](./(GITHUB)%20Graphs/result_MWTR_schedule.gif)
 
 ## Dynamic Job Shop Scheduling (DJSSP) environment configuration
-------------
 The dynamic job scheduling environment is characteristed by these parameters: 
 - **Number of Machines**: `6`
 - **Maximum Allowable Jobs**: `25` to `40` with intervals of 5
@@ -47,11 +45,9 @@ The dynamic job scheduling environment is characteristed by these parameters:
 The variation between each variable are kept minimum to allow for a more stable result. 
 
 ## Dispatching Rule
-------------
 S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. MTWR is chosen because it is able to reduce the makespan of the jobs. Therefore, an deep MARL trained on these two objective will be used to benchmark against these existing dispatching rule.
 
 ## Deep reinforcement learning actor-critic (Stable baseline 3 + OpenAI Gym)
-------------
 ## Reward Function design (Dense reward function)
 All the rewards are normalised to [-1,1]
 | Condition | Reward | Remarks | Goal | 
