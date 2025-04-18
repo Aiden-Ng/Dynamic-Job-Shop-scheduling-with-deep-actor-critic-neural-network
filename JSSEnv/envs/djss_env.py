@@ -127,8 +127,8 @@ class DynamicJssEnv(JssEnv):
 
         # ================= PLEASE DEBUG THIS SECTION ================= 
         #add the due date based on proportion of total work (TWK)
-        # self.alpha_list = [10,12]
-        self.alpha_list = [10,17] #
+        self.alpha_list = [10,20]
+        # self.alpha_list = [10,17] #
         self.alpha = random.randint(self.alpha_list[0],self.alpha_list[1]) #this is for 20 jobs
         # self.alpha = random.randint(20,23) #this is for 60 jobs
 
@@ -191,15 +191,25 @@ class DynamicJssEnv(JssEnv):
                 else self.instance_matrix[job][self.todo_time_step_job[job]][1]
                 for job in range(len(self.instance_matrix))])
 
+                # ------------------- TEMPORARY DISABLED ------------------- previous
                 # no need to do filtering here because the illegal actions will be filtered by modified_due_date_per_operation
                 due_date_for_kth_operation =np.where( 
                     self.legal_actions[:-1].astype(bool), #only calculate for legal actions, because it will be wrong for non legal_actions
                     self.total_perform_op_time_jobs + current_processing_time, #get the due date for the kth operation
                     np.nan)
+                
+                # ------------------- TEMPORARY DISABLED ------------------- incoming
+                current_processing_time_filtered =np.where( 
+                    self.legal_actions[:-1].astype(bool), #only calculate for legal actions, because it will be wrong for non legal_actions
+                    current_processing_time, #get the due date for the kth operation
+                    np.nan)
+                
+
+
 
                 #debug
-                SPRT_ratio_current_processing_time = SRPT_ratio * due_date_for_kth_operation #get the processing time of the SRPT_ratio_compare
-                SRPT_ratio_compare_current_processing_time = SRPT_ratio_compare * due_date_for_kth_operation #get the processing time of the SRPT_ratio_compare
+                SPRT_ratio_current_processing_time = SRPT_ratio * current_processing_time_filtered #get the processing time of the SRPT_ratio_compare
+                SRPT_ratio_compare_current_processing_time = SRPT_ratio_compare * current_processing_time_filtered #get the processing time of the SRPT_ratio_compare
 
                 # Use np.where() instead of np.maximum()
                 modified_due_date_per_operation = np.where(

@@ -59,10 +59,9 @@ class action_type(Enum):
     RANDOM = 5
 
 # relative to your local pc
-IMG_PATH = (Path(__file__).parent / "(TESTING) automated_testing" / "(PLOT) makespan").resolve()
-GIF_PATH = (Path(__file__).parent / "(TESTING) automated_testing" / "(GIF) scheduling").resolve()
-DEBUG_PATH = (Path(__file__).parent / "Project" / "(DEBUG)").resolve()
-
+IMG_PATH = (Path(__file__).parent / ".." / "(TESTING) automated_testing" / "(PLOT) makespan").resolve()
+GIF_PATH = (Path(__file__).parent / ".." / "(TESTING) automated_testing" / "(GIF) scheduling").resolve()
+DEBUG_PATH = (Path(__file__).parent / "(DEBUG)").resolve()
 
 MODEL_VERSION = "A2C_V57" 
 TRAINING = False
@@ -71,9 +70,9 @@ LOAD_TIME_STEP = 1400000
 SAVING_TIME_STEP = 1000000 #timestep for saving
 
 # this is for saving the reinforcement learning models and logging files
-models_dir = (Path(__file__).parent / "Project" / "Model" / f"{MODEL_VERSION}").resolve()
-log_dir = (Path(__file__).parent / "Project" / "model_logs").resolve()
-network_param_dir = (Path(__file__).parent / "Project" / "network_parameters").resolve()
+models_dir = (Path(__file__).parent / "Model" / f"{MODEL_VERSION}").resolve()
+log_dir = (Path(__file__).parent / "model_logs").resolve()
+network_param_dir = (Path(__file__).parent / "network_parameters").resolve()
 
 #create argparser object to handle the variables from the automated_test.py
 parser = argparse.ArgumentParser(description='Automated test script to run the environment')
@@ -82,11 +81,11 @@ parser.add_argument("--action_type", help = "[action_type.RANDOM, action_type.S_
 parser.add_argument("--max_jobs", help = "[25,30,35,40,45,50]", type = int)
 parser.add_argument("--logging_xlsx_path", help = "this is the absolute path for the excel file for logging", type = str)
 args = parser.parse_args()
-args.logging_xlsx_path = (Path(__file__).parent / "(TESTING) automated_testing" / "automated_test_log.xlsx" ).resolve()
+args.logging_xlsx_path = (Path(__file__).parent / ".." / "(TESTING) automated_testing" / "automated_test_log.xlsx" ).resolve()
 
-# args.episode = 1
-# args.action_type = "A2C"
-# args.max_jobs = 25
+args.episode = 1
+args.action_type = "A2C"
+args.max_jobs = 30
 # args.action_type = "PPO"
 # args.action_type = "S_RPT"
 # args.action_type = "MTWR"
@@ -167,6 +166,7 @@ if __name__ == "__main__":
         # torch.save(param, r"D:\NTU document\Academic stuff (NTU)\Y4S1\Final Year Project\Code\JSSP_Env\Project\network_parameters\param1.pth")
     
     for episode in range(EPISODE):
+        main_count = 0 #reset
         #parallel environment  
         obs, info = env.reset(options = {"max_jobs": args.max_jobs})
         done = False
@@ -228,9 +228,15 @@ if __name__ == "__main__":
 
             main_count += 1
             print(main_count)
-            # if main_count > 40000:
-            #     sys.exit(0) 
-            #     print("exit abruptly")
+            if main_count > 30000:
+                makespan_df.to_csv(rf"D:\NTU document\Academic stuff (NTU)\Y4S1\Archive\{args.action_type}_{args.max_jobs}_makespan.csv", header = False , index = False , mode = "a")
+                print("exit abruptly")
+                #how to reset the value but keep the column
+                makespan_df = pd.DataFrame(columns = ["makespan", "makespan_count"])
+                break
+                
+                
+
             
 
             if np.all(done): #per epsiode 
@@ -252,7 +258,7 @@ if __name__ == "__main__":
         # env.close()
 
     logging_to_xslx(float(total_number_of_tardy_job)/float(total_jobs)) #open the excel file and write here
-    # makespan_df.to_csv(rf"D:\NTU document\Academic stuff (NTU)\Y4S1\Archive\{args.action_type}_{args.max_jobs}_makespan.csv", header = False , index = False , mode = "a")
+    makespan_df.to_csv(rf"D:\NTU document\Academic stuff (NTU)\Y4S1\Archive\{args.action_type}_{args.max_jobs}_makespan.csv", header = False , index = False , mode = "a")
     # saving_to_png()
     saving_to_kde()
 
