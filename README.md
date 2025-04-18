@@ -12,21 +12,14 @@
   - [Comparing both Dispatching rule and Deep actor-critic reinforcement learning](#comparing-both-dispatching-rule-and-deep-actor-critic-reinforcement-learning)
     - [Tardy jobs comparison](#tardy-jobs-comparison)
     - [Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.](#makespan-comparison-the-makespan-kde-plot-is-calculated-from-simulations-with-5000-episodes)
-- [YET TO DO](#yet-to-do)
 - [Project Organization](#project-organization)
 - [License](#license)
 
-
-
-
-
-
-
 # Final Year Project - Dynamic Job-Shop Scheduling Environment 
+------------
 An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Scheduling Problem
 
 ## Abstract
-------------
 This repository contains all the code for the implementation of deep actor-critic reinforcement learning for dynamic job shop scheduling problem (DJSSP). The open sources libraries that was used for this implementation includes Stable Baseline 3 for the deep actor critic reinforcement learning and Open AI Gym for the DJSSP implementation.
 
 ## Example of each scheduling method per EPISODE
