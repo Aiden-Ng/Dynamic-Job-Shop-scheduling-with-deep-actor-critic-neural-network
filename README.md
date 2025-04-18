@@ -20,7 +20,7 @@
 
 
 
-### Gif (Just demonstration for each dispatching rule)
+
 
 # Final Year Project - Dynamic Job-Shop Scheduling Environment 
 An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Scheduling Problem
@@ -30,6 +30,7 @@ An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Schedulin
 This repository contains all the code for the implementation of deep actor-critic reinforcement learning for dynamic job shop scheduling problem (DJSSP). The open sources libraries that was used for this implementation includes Stable Baseline 3 for the deep actor critic reinforcement learning and Open AI Gym for the DJSSP implementation.
 
 ## Example of each scheduling method per EPISODE
+### Gif (Just demonstration for each dispatching rule)
 1. First in first out (FIFO)
 
  ![GIF not loaded](./(GITHUB)%20Graphs/result_FIFO_schedule.gif)
@@ -63,9 +64,11 @@ All the rewards are normalised to [-1,1]
 | Condition | Reward | Remarks | Goal | 
 | ------------- | ------------- | ------------- | ------------- |
 | Illegal actions | `-1` | If the agent take illegal action then we will penalise it | To teach the agent to take legal actions | 
-| Processed Jobs | `+ 1 * time_processed` | For every unit of time that the job is processed, the agent receives a reward equivalent to the amount of processed time | To encourage agent to keep selecting jobs | 
-| Machine idle time | `- 1 * time_idle` | For every unit time of machine being idle, the agent will be penalized | To minimize makespan | 
-| Job past its due date | if late `-1/3` else `+1` | | To lower number of tardy jobs |
+| Processed job for each operation | `+1 * time processed / max operation time` | For every unit of time that the job is processed, the agent receives a reward equivalent to the amount of processed time divided by the maximum operation time of all job to scale down the reward | To encourage agent to keep selecting jobs | 
+| Machine idle time | `-1 * machine time idle / max operation time` | For every unit time of machine being idle, the agent will be penalized. The division of max operation time is added to normalise this reward | To minimize makespan | 
+| Job past its due date | if late `-1/3` else `+1` | If slack < 0 when the job is processed finish means that the job is late
+
+ | To lower number of tardy jobs |
 
 ## Synchronous actor critic reinforcement learning (A2C from stable baseline 3) 
 link : https://stable-baselines3.readthedocs.io/en/master/modules/a2c.html
