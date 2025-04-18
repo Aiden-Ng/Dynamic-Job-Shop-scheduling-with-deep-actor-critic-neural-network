@@ -36,13 +36,30 @@ This repository contains all the code for the implementation of deep actor-criti
  ![GIF not loaded](./(GITHUB)%20Graphs/result_MWTR_schedule.gif)
 
 ## Dynamic Job Shop Scheduling (DJSSP) environment configuration
-The dynamic job scheduling environment is characteristed by these parameters: 
+**The dynamic job scheduling environment is characteristed by these parameters:** 
 - **Number of Machines**: `6`
 - **Maximum Allowable Jobs**: `25` to `40` with intervals of 5
 - **Processing Time Range**: `[50, 60]`
 - **Allowable Number of Operations per Job**: `[8, 9]`
 - **Due Date Tightness (α)**: `[10, 20]`
-The variation between each variable are kept minimum to allow for a more stable result. 
+- **New job arrival probability**: `0.2`
+The variation between each variable are kept minimum to allow for a more stable result.
+
+**The figure below demonstrates how random job will arrive during each timestep**
+
+The system will have at minimum 1 job from the start, and the job will arrive during each timestep with the probability mentioned in the environment configuration.
+
+<img src= "Project/(FYP) Data/(IMAGE) DJSSP_Env/DJSS timestep 1.png" height = "60%" width = "60%">
+
+If the new job arrive, the scheduler have to decide which job that it wants to schedule, after the scheduling decision is made, it will look like the figure below.
+
+<img src= "Project/(FYP) Data/(IMAGE) DJSSP_Env/DJSS timestep 1 - scheduling decision.png" height = "60%" width = "60%">
+
+If there are no new job after finishing the first job first operation, the system will continue to process that job until new job arrives.
+
+<img src= "Project/(FYP) Data/(IMAGE) DJSSP_Env/DJSS timestep 2.png" height = "60%" width = "60%">
+
+We only consider the case where there is at least one job in the system. 
 
 ## Dispatching Rule
 S_RPT + SPT is chosen because of its ability to reduce number of job tardiness. MTWR is chosen because it is able to reduce the makespan of the jobs. Therefore, an deep MARL trained on these two objective will be used to benchmark against these existing dispatching rule.
