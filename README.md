@@ -49,7 +49,7 @@ The dynamic job scheduling environment is characteristed by these parameters:
 - **Maximum Allowable Jobs**: `25` to `40` with intervals of 5
 - **Processing Time Range**: `[50, 60]`
 - **Allowable Number of Operations per Job**: `[8, 9]`
-- **Due Date Tightness (α)**: `[10, 12]`
+- **Due Date Tightness (α)**: `[10, 20]`
 The variation between each variable are kept minimum to allow for a more stable result. 
 
 ## Dispatching Rule
@@ -108,19 +108,19 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 
 #### **Performance for each individual scheduling methods at max_jobs =`25`**
 
-<img src = "./Project/(FYP) Data/COMBINED_25_5000_makespan.png" weight = "60%" height = "60%">
+<img src = "./Project/(FYP) Data/(PLOT) Makespan Adjusted/COMBINED_25_5000_makespan.png" weight = "60%" height = "60%">
 
 #### **Performance for each individual scheduling methods at max_jobs =`30`**
 
-<img src = "./Project/(FYP) Data/COMBINED_30_5000_makespan.png" weight = "60%" height = "60%">
+<img src = "./Project/(FYP) Data/(PLOT) Makespan Adjusted/COMBINED_30_5000_makespan.png" weight = "60%" height = "60%">
 
 #### **Performance for each individual scheduling methods at max_jobs =`35`**
 
-<img src = "./Project/(FYP) Data/COMBINED_35_5000_makespan.png" weight = "60%" height = "60%">
+<img src = "./Project/(FYP) Data/(PLOT) Makespan Adjusted/COMBINED_35_5000_makespan.png" weight = "60%" height = "60%">
 
 #### **Performance for each individual scheduling methods at max_jobs =`40`**
 
-<img src = "./Project/(FYP) Data/COMBINED_35_5000_makespan.png" weight = "60%" height = "60%">
+<img src = "./Project/(FYP) Data/(PLOT) Makespan Adjusted/COMBINED_35_5000_makespan.png" weight = "60%" height = "60%">
 
 ## Project Organization
 ------------
