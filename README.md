@@ -25,13 +25,9 @@
 # Final Year Project - Dynamic Job-Shop Scheduling Environment 
 An optimized OpenAi gym's environment to simulate the Dynamic Job Shop Scheduling Problem
 
-## Disclaimer 
+## Abstract
 ------------
-For my professor or PhD student reviewing my repository, please note that I have added a dynamic scheduling decorator on top of the existing static JSSP environment, which was originally developed by someone else. The dynamic scheduling decorator is a wrapper around the static JSSP class that enables the generation of dynamically arriving jobs.
-
-However, I soon realized that testing and benchmarking in the dynamic environment require a large number of episodes (potentially more than 10,000) due to the randomness of job arrivals. Therefore, at this stage, a static JSSP will be used as a foundation for benchmarking existing dispatching rules and potentially a deep MARL (Multi-Agent Reinforcement Learning) actor-critic agent during the initial phase.
-
-Once the deep MARL agent is set up, it will be applied to the dynamic JSSP environment, where benchmarking will be conducted over many episodes to compare the deep MARL approach with existing dispatching rules.
+This repository contains all the code for the implementation of deep actor-critic reinforcement learning for dynamic job shop scheduling problem (DJSSP). The open sources libraries that was used for this implementation includes Stable Baseline 3 for the deep actor critic reinforcement learning and Open AI Gym for the DJSSP implementation.
 
 ## Example of each scheduling method per EPISODE
 1. First in first out (FIFO)
@@ -91,147 +87,40 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 ### Deep actor-critic reinforcement learning results
 ## Comparing both Dispatching rule and Deep actor-critic reinforcement learning
 ### Tardy jobs comparison
-**1000 Episodes**
-
-| action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
-| ------------- | ------------- | ------------- | 
-| FIFO | 25 | 42.9% |
-| S_RPT + SPT | 25 | 57.4% |
-| MTWR | 25 | 60.7% |
-| A2C | 25 |  35.5% |
-| FIFO | 30 | 63.0% | 
-| S_RPT + SPT | 30 | 79.5% |
-| MTWR | 30 | 78.2% |
-| A2C | 30 | 61.3% |
-| FIFO | 35 | 78.2% |
-| S_RPT + SPT | 35 | 95.5% |
-| MTWR | 35 | 94.7% |
-| A2C | 35 | 80.4% |
-| FIFO | 40 | 88.8% |
-| S_RPT + SPT | 40 | 99.6% |
-| MTWR | 40 | 99.3% |
-| A2C | 40 | 93.7% |
-
-**3000 Episodes**
-
-| action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
-| ------------- | ------------- | ------------- | 
-| FIFO | 25 | 43.7% |
-| S_RPT + SPT | 25 | 57.1% |
-| MTWR | 25 | 57.6% |
-| A2C | 25 | 35.1% |
-| FIFO | 30 | 64.5% |
-| S_RPT + SPT | 30 | 78.9% |
-| MTWR | 30 | 79.1% |
-| A2C | 30 | 61.0% |
-| FIFO | 35 | 79.8% |
-| S_RPT + SPT | 35 | 95.8% |
-| MTWR | 35 | 94.0% |
-| A2C | 35 | 80.4% |
-| FIFO | 40 | 89.3% |
-| S_RPT + SPT | 40 | 99.6% |
-| MTWR | 40 | 99.4% |
-| A2C | 40 | 93.4% |
-
 **5000 Episodes**
 
 | action_type | maximum allowable jobs | Number of tardy jobs in percentage per episode | 
 | ------------- | ------------- | ------------- | 
-| FIFO | 25 | 43.6% |
-| S_RPT + SPT | 25 | 58.2% |
-| MTWR | 25 | 58.5% |
-| A2C | 25 | 35.0% |
-| FIFO | 30 | 63.1% |
-| S_RPT + SPT | 30 | 77.7% |
-| MTWR | 30 | 78.6% |
-| A2C | 30 | 60.9% |
-| FIFO | 35 | 80.0% |
-| S_RPT + SPT | 35 | 95.6% |
-| MTWR | 35 | 94.5% |
-| A2C | 35 | 80.4% |
-| FIFO | 40 | 89.3% |
-| S_RPT + SPT | 40 | 99.6% |
-| MTWR | 40 | 99.3% |
-| A2C | 40 | 93.3% |
+| S_RPT + SPT | 25 | 25.5% |
+| MTWR | 25 | 31.8% |
+| A2C | 25 | 8.2% |
+| S_RPT + SPT | 30 | 42.9%% |
+| MTWR | 30 | 47.9%% |
+| A2C | 30 | 25.4% |
+| S_RPT + SPT | 35 | 57.7% |
+| MTWR | 35 | 61.9% |
+| A2C | 35 | 36.9% |
+| S_RPT + SPT | 40 | 72.3% |
+| MTWR | 40 | 73.4% |
+| A2C | 40 | 57.2% |
 
 ### Makespan comparison, the makespan KDE plot is calculated from simulations with 5000 episodes.
 
 #### **Performance for each individual scheduling methods at max_jobs =`25`**
 
-First in First out (FIFO)
-
-<img src = "./(GITHUB) Graphs/(25) 2025-04-08_04-45-01_FIFO_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Slack over remaining processing time + shortest processing time (S/RPT + SPT)
-
-<img src = "./(GITHUB) Graphs/(25) 2025-04-08_05-09-22_S_RPT_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Most total work remaining (MTWR)
-
-<img src = "./(GITHUB) Graphs/(25) 2025-04-08_05-34-10_MTWR_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Deep actor-critic reinforcement learning (A2C)
-
-<img src = "./(GITHUB) Graphs/(25) 2025-04-09_10-30-15_A2C_5000_makespan_kdeplot.png" width = "60%" height = "60%">
+<img src = "./Project/(FYP) Data/COMBINED_25_5000_makespan.png" weight = "60%" height = "60%">
 
 #### **Performance for each individual scheduling methods at max_jobs =`30`**
 
-First in First out (FIFO)
-
-<img src = "./(GITHUB) Graphs/(30) 2025-04-08_04-53-17_FIFO_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Slack over remaining processing time + shortest processing time (S/RPT + SPT)
-
-<img src = "./(GITHUB) Graphs/(30) 2025-04-08_05-18-31_S_RPT_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Most total work remaining (MTWR)
-
-<img src = "./(GITHUB) Graphs/(30) 2025-04-08_05-42-30_MTWR_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Deep actor-critic reinforcement learning (A2C)
-
-
+<img src = "./Project/(FYP) Data/COMBINED_30_5000_makespan.png" weight = "60%" height = "60%">
 
 #### **Performance for each individual scheduling methods at max_jobs =`35`**
 
-First in First out (FIFO)
-
-<img src = "./(GITHUB) Graphs/(35) 2025-04-07_06-33-01_FIFO_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Slack over remaining processing time + shortest processing time (S/RPT + SPT)
-
-<img src = "./(GITHUB) Graphs/(35) 2025-04-07_06-42-45_S_RPT_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Most total work remaining (MTWR)
-
-<img src = "./(GITHUB) Graphs/(35) 2025-04-07_06-51-48_MTWR_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Deep actor-critic reinforcement learning (A2C)
-
-<img src = "./(GITHUB) Graphs/(35) 2025-04-07_23-53-27_A2C_3000_makespan_kdeplot.png" width = "60%" height = "60%">
+<img src = "./Project/(FYP) Data/COMBINED_35_5000_makespan.png" weight = "60%" height = "60%">
 
 #### **Performance for each individual scheduling methods at max_jobs =`40`**
 
-First in First out (FIFO)
-
-<img src = "./(GITHUB) Graphs/(40) 2025-04-07_07-02-19_FIFO_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Slack over remaining processing time + shortest processing time (S/RPT + SPT)
-
-<img src = "./(GITHUB) Graphs/(40) 2025-04-07_07-13-40_S_RPT_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Most total work remaining (MTWR)
-
-<img src = "./(GITHUB) Graphs/(40) 2025-04-07_07-24-11_MTWR_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-Deep actor-critic reinforcement learning (A2C)
-
-<img src = "./(GITHUB) Graphs/(40) 2025-04-09_10-21-25_A2C_5000_makespan_kdeplot.png" width = "60%" height = "60%">
-
-
-### YET TO DO 
-1. Design reward function ✅
-2. Benchmark the single A2C RL agent with the dispatching rule (S_RPT + SPT) and MTWR ✅
+<img src = "./Project/(FYP) Data/COMBINED_35_5000_makespan.png" weight = "60%" height = "60%">
 
 ## Project Organization
 ------------
@@ -247,11 +136,14 @@ Deep actor-critic reinforcement learning (A2C)
     |    ├── automated_test.py <- this function automates my test by running n number of episode so that I can review their performance and get the result above
     |    ├── automated_test_log_xlsx <- this is to store my number of tardyness data in excel format which was generated by the automated_test.py 
     |    
-    ├── RL_environment.py <- This is where I generate the episodes.
-    |
-    |
-    |
-    
+    ├── Project
+        ├── RL_environment.py <- This is where I generate the episodes.
+        ├── Reward_Function.xlsx <- log book for the trained model 
+        ├── Model <- contain all the differnt agent trained on different reward function, different environment configurations. The information are stored inside Reward_Function.xslx
+        ├── model_logs <- Stores the tensorboard log for the deep a2c agent
+        ├── (FYP) Data <- contains all the data that is shown in the README file
+            ├── (PLOT) Makespan <- makespan plot that contain all the episodes, including those who terminated prematurely. 
+            ├── (PLOT) Makespan Adjusted <- removed the episodes that terminates prematurely
 --------
 
 
