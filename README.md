@@ -103,8 +103,8 @@ link : https://stable-baselines3.readthedocs.io/en/master/guide/custom_policy.ht
 | S_RPT + SPT | 25 | 25.5% |
 | MTWR | 25 | 31.8% |
 | A2C | 25 | 8.2% |
-| S_RPT + SPT | 30 | 42.9%% |
-| MTWR | 30 | 47.9%% |
+| S_RPT + SPT | 30 | 42.9% |
+| MTWR | 30 | 47.9% |
 | A2C | 30 | 25.4% |
 | S_RPT + SPT | 35 | 57.7% |
 | MTWR | 35 | 61.9% |
