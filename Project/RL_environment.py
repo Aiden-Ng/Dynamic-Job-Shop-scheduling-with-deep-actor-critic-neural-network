@@ -85,7 +85,7 @@ args.logging_xlsx_path = (Path(__file__).parent / ".." / "(TESTING) automated_te
 
 args.episode = 1
 args.action_type = "A2C"
-args.max_jobs = 30
+args.max_jobs = 25
 # args.action_type = "PPO"
 # args.action_type = "S_RPT"
 # args.action_type = "MTWR"
@@ -214,17 +214,17 @@ if __name__ == "__main__":
             cumulative_reward += reward
 
             # 3. Render the current schedule as a Plotly figure
-            # fig = env.render()  # This returns a Plotly figure.
+            fig = env.render()  # This returns a Plotly figure.
             # fig.show()
             
             # 4. Convert Plotly figure to an in-memory image
-            # try:
-            #     img_bytes = pio.to_image(fig, format="png")  # Convert figure to PNG bytes
-            #     img = imageio.imread(BytesIO(img_bytes))  # Read image from bytes
-            #     images.append(img)  # Store for GIF creation
-            #     print(f"Frame {len(images)} added.")
-            # except Exception as e:
-            #     print("Error converting figure to image:", e)
+            try:
+                img_bytes = pio.to_image(fig, format="png")  # Convert figure to PNG bytes
+                img = imageio.imread(BytesIO(img_bytes))  # Read image from bytes
+                images.append(img)  # Store for GIF creation
+                print(f"Frame {len(images)} added.")
+            except Exception as e:
+                print("Error converting figure to image:", e)
 
             main_count += 1
             print(main_count)
@@ -263,13 +263,13 @@ if __name__ == "__main__":
     saving_to_kde()
 
     # 5. Save GIF
-    # if images:
-    #     str_format = "%Y-%m-%d_%H-%M-%S"
-    #     gif_path = rf"{GIF_PATH}\{datetime.now().strftime(str_format)}_{args.action_type}_{args.episode}_schedule.gif"
-    #     imageio.mimsave(gif_path, images, fps=15)  # Adjust FPS as needed
-    #     print(f"GIF saved as {gif_path}!")
-    # else:
-    #     print("No images were saved. GIF generation failed.")
+    if images:
+        str_format = "%Y-%m-%d_%H-%M-%S"
+        gif_path = rf"{GIF_PATH}\{datetime.now().strftime(str_format)}_{args.action_type}_{args.episode}_schedule.gif"
+        imageio.mimsave(gif_path, images, fps=15)  # Adjust FPS as needed
+        print(f"GIF saved as {gif_path}!")
+    else:
+        print("No images were saved. GIF generation failed.")
     
     print("End of programme.")
 
